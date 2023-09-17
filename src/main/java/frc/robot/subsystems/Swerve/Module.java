@@ -1,16 +1,23 @@
 package frc.robot.subsystems.Swerve;
 
+
+
+import com.revrobotics.ColorSensorV3.ProximitySensorResolution;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.subsystems.Swerve.ModuleIOFalcon500.ModulePosition;
 
-public class Module {
+public class Module extends SubsystemBase {
     private final ModuleIO io;
     private final ModuleIOInputsAutoLogged inputs = new ModuleIOInputsAutoLogged();
-    private final boolean isInverted;
+    private final ModulePosition position;
+    
     private static double wheelBase = 0.415;
     public static double loopPeriodSecs = 0.02;
 
@@ -20,9 +27,10 @@ public class Module {
   private final PIDController steerFeedback =
       new PIDController(0.0, 0.0, 0.0, loopPeriodSecs);
 
-    public Module(ModuleIO io, Boolean isInverted) {
+    public Module(ModuleIO io, ModulePosition position) {
         this.io = io;
-        this.isInverted = isInverted;
+        this.position = position;
+       
     }
 
     public void updateInputs() {
@@ -71,6 +79,10 @@ public class Module {
 
       public SwerveModuleState getState() {
         return new SwerveModuleState(getVelocityMetersPerSec(), getAngle());
+      }
+
+      public ModulePosition getModulePosition() {
+        return position;
       }
     
 
