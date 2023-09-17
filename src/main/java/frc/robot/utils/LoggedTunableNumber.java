@@ -19,14 +19,16 @@ import frc.robot.config.YAMLDataHolder;
  */
 public class LoggedTunableNumber {
   private static final String tableKey = "TunableNumbers";
-  private YAMLDataHolder m_constants = new YAMLDataHolder();
+  private YAMLDataHolder m_constants = YAMLDataHolder.getInstance();
 
   private final String key;
+  private final String yamlKey;
   private boolean hasDefault = false;
   private double defaultValue;
   private LoggedDashboardNumber dashboardNumber;
-  private Map<Integer, Double> lastHasChangedValues = new HashMap<>();
-  private boolean tuningMode = (boolean) m_constants.getProperty("tuningMode");
+  private Map<Integer, Object> lastHasChangedValues = new HashMap<>();
+  private boolean tuningMode = true;
+  
   
 
   /**
@@ -36,18 +38,12 @@ public class LoggedTunableNumber {
    */
   public LoggedTunableNumber(String dashboardKey) {
     this.key = tableKey + "/" + dashboardKey;
+    this.yamlKey = dashboardKey;
+    initDefault((double) m_constants.getProperty(yamlKey));
   }
 
-  /**
-   * Create a new LoggedTunableNumber with the default value
-   *
-   * @param dashboardKey Key on dashboard
-   * @param defaultValue Default value
-   */
-  public LoggedTunableNumber(String dashboardKey, double defaultValue) {
-    this(dashboardKey);
-    initDefault(defaultValue);
-  }
+ 
+
 
   /**
    * Set the default value of the number. The default value can only be set once.
@@ -69,7 +65,7 @@ public class LoggedTunableNumber {
    *
    * @return The current value
    */
-  public double get() {
+  public Object get() {
     
     if (!hasDefault) {
       return 0.0;
@@ -77,6 +73,17 @@ public class LoggedTunableNumber {
       return tuningMode ? dashboardNumber.get() : defaultValue;
     }
   }
+
+  public void set( double value) {
+    dashboardNumber.set(value);
+   
+  }
+
+  public void periodic() {
+    m_constants.setProperty(yamlKey, get());
+  }
+
+  
 
   /**
    * Checks whether the number has changed since our last check
@@ -87,10 +94,11 @@ public class LoggedTunableNumber {
    *     otherwise.
    */
   public boolean hasChanged(int id) {
-    double currentValue = get();
-    Double lastValue = lastHasChangedValues.get(id);
+    Object currentValue = get();
+    Object lastValue = lastHasChangedValues.get(id);
     if (lastValue == null || currentValue != lastValue) {
       lastHasChangedValues.put(id, currentValue);
+    
       return true;
     }
 

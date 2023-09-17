@@ -44,11 +44,6 @@ public class Swerve extends SubsystemBase {
       private final GyroIO gyroIO;
       private final GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
 
-      private PIDController xPIDController = new PIDController(1, 0, 0);
-
-      private PIDController yPIDController = new PIDController(1, 0, 0);
-      private ProfiledPIDController profiledTurnController = new ProfiledPIDController(1, 0, 0, new TrapezoidProfile.Constraints(1, 1));
-      private PIDController turnController = new PIDController(1, 0,0);
 
       public static final Map<ModulePosition, Translation2d> MODULE_TRANSLATIONS = Map.of(
         ModulePosition.FRONT_LEFT,

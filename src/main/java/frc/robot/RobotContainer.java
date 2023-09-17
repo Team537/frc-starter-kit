@@ -4,6 +4,7 @@ import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import frc.robot.commands.SwerveDriveCommand;
+import frc.robot.config.YAMLDataHolder;
 import frc.robot.subsystems.Gyro.GyroIO;
 import frc.robot.subsystems.Gyro.GyroIOPigeon2;
 import frc.robot.subsystems.Swerve.ModuleIO;
@@ -16,11 +17,14 @@ public class RobotContainer {
     private Swerve swerve;
     private Mode mode = Mode.SIM;
     private XboxController controller = new XboxController(0);
+    private YAMLDataHolder yamlDataHolder;
     
 
     
 
     public RobotContainer() {
+
+        yamlDataHolder = YAMLDataHolder.getInstance();
         switch(mode) {
             case REAL:
                 swerve = new Swerve( new GyroIOPigeon2(), 
@@ -59,6 +63,12 @@ public class RobotContainer {
 
     public void onDisable(){
         swerve.stop();
+        yamlDataHolder.saveData();
+        
+    }
+
+    public void periodic() {
+       
     }
 
     public enum Mode {
