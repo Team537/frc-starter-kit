@@ -32,6 +32,7 @@ public class Module extends SubsystemBase {
     public static double loopPeriodSecs = 0.02;
 
     private SimpleMotorFeedforward driveFeedforward = new SimpleMotorFeedforward(0.01, 0.5);
+    private SimpleMotorFeedforward steerFeedforward = new SimpleMotorFeedforward(0, 0);
   private final PIDController driveFeedback =
       new PIDController(0.75, 0.0, 0.0, loopPeriodSecs);
   private final PIDController steerFeedback =
@@ -56,7 +57,8 @@ public class Module extends SubsystemBase {
 
        
         
-        io.setSteerVoltage(
+        io.setSteerVoltage( steerFeedforward.calculate(optimizedState.angle.getRadians())
+            +
         steerFeedback.calculate(getAngle().getRadians(), optimizedState.angle.getRadians()));
 
         double velocityRadPerSec = optimizedState.speedMetersPerSecond / wheelBase;
