@@ -65,19 +65,24 @@ public class ModuleIOSim implements ModuleIO {
         inputs.steerTemperatureCelcius = new double[] {};
         Unmanaged.feedEnable(20);
 
+       
+
     }
 
-    public void setDriveVolts(double volts) {
+    public void setDriveVoltage(double volts) {
         
         driveVolts = MathUtil.clamp(volts, -12.0, 12.0);
-        driveSim.setInputVoltage(driveVolts);
+       
+        driveSim.setInputVoltage(driveVolts );
 
     }
 
-    public void setTurnVolts(double volts) {
+    public void setSteerVoltage(double volts) {
     
         turnVolts  = MathUtil.clamp(volts, -12.0, 12.0);
         turnSim.setInputVoltage(turnVolts);
 
     }
+
+   
 }

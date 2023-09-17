@@ -116,6 +116,7 @@ public class Robot extends LoggedRobot {
   /** This function is called once when the robot is disabled. */
   @Override
   public void disabledInit() {
+    m_robotContainer.onDisable();
   }
 
   /** This function is called periodically when disabled. */
@@ -141,5 +142,8 @@ public class Robot extends LoggedRobot {
   /** This function is called periodically whilst in simulation. */
   @Override
   public void simulationPeriodic() {
+    CommandScheduler.getInstance().run();
+  
+    SmartDashboard.putData(CommandScheduler.getInstance());
   }
 }

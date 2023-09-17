@@ -5,6 +5,8 @@ import java.util.Map;
 
 import org.littletonrobotics.junction.Logger;
 
+import com.ctre.phoenix.unmanaged.Unmanaged;
+
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
@@ -32,10 +34,11 @@ public class Swerve extends SubsystemBase {
         private Module backLeftModule;
         private Module backRightModule;
 
-        private double MAX_SPEED_METERS_PER_SECOND  = 5.0;
+        private double MAX_SPEED_METERS_PER_SECOND  = 2.0;
         private static double wheelBase = 0.415;
     public static double trackwidthMeters = 0.415;
 
+    private double simYaw = 0;
       private HashMap<ModulePosition, Module>   swerveModules = new HashMap<ModulePosition, Module>();
 
       private final GyroIO gyroIO;
@@ -61,7 +64,7 @@ public class Swerve extends SubsystemBase {
 
     public static final SwerveDriveKinematics SWERVE_KINEMATICS = new SwerveDriveKinematics(
         ModuleMap.orderedValues(MODULE_TRANSLATIONS, new Translation2d[0]));
-    private static final double MAX_ROTATION_RADIANS_PER_SECOND = Math.PI * 2.0;
+    private static final double MAX_ROTATION_RADIANS_PER_SECOND = Math.PI ;
 
       public Swerve(GyroIO gyroIO,  ModuleIO flModuleIO,
       ModuleIO frModuleIO,
@@ -123,8 +126,16 @@ public class Swerve extends SubsystemBase {
   
      
     }
+
+    
     public Rotation2d getHeadingRotation2d() {
         return Rotation2d.fromRadians(gyroInputs.yawPositionRad);
+      }
+
+      public void stop(){
+        for(Module module : ModuleMap.orderedValuesList(swerveModules)){
+          module.stop();
+        }
       }
     
     public SwerveModulePosition[] getModulePositions() {
@@ -157,14 +168,32 @@ public class Swerve extends SubsystemBase {
         }
       }
 
+      public Map<ModulePosition, SwerveModuleState> getModuleStates() {
+        Map<ModulePosition, SwerveModuleState> map = new HashMap<>();
+        for (ModulePosition i : swerveModules.keySet()) {
+          map.put(i, swerveModules.get(i).getState());
+        }
+        return map;
+      }
+
       @Override 
       public void periodic() {
+        ChassisSpeeds chassisSpeed = SWERVE_KINEMATICS.toChassisSpeeds(
+          ModuleMap.orderedValues(getModuleStates(), new SwerveModuleState[0]));
         updateOdometry();
-        Logger.getInstance().recordOutput("Pose", getPoseMeters().toString());
+        // Logger.getInstance().recordOutput("Pose", getPoseMeters().toString());
+        SmartDashboard.putNumber("Odo X", odometry.getEstimatedPosition().getX());
+        SmartDashboard.putNumber("Odo Y", odometry.getEstimatedPosition().getY());
+        SmartDashboard.putNumber("Odo Yaw", odometry.getEstimatedPosition().getRotation().getDegrees());
 
+        SmartDashboard.putString("Gyro Angle", getHeadingRotation2d().toString());
+        Unmanaged.feedEnable(20);
+        simYaw += chassisSpeed.omegaRadiansPerSecond * 0.02;
+        gyroIO.setHeading(simYaw);
         
         gyroIO.updateInputs(gyroInputs);
-        
+       
+        Logger.getInstance().recordOutput("Swerve Pose", getPoseMeters());
         Logger.getInstance().processInputs("Gyro", gyroInputs);
         
       }

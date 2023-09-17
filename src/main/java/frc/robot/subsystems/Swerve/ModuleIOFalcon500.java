@@ -121,24 +121,24 @@ public class ModuleIOFalcon500 implements ModuleIO{
         inputs.steerTemperatureCelcius = new double[] { m_turn.getTemperature() };
     }
 
-    public void setDriveVolts(double volts) {
+    public void setDriveVoltage(double volts) {
 
         m_drive.set(ControlMode.PercentOutput, volts / 12);
 
     }
 
-    public void setTurnVolts(double volts) {
+    public void setSteerVoltage(double volts) {
 
         m_turn.set(ControlMode.PercentOutput, volts / 12);
 
     }
 
-    public void setDriveBrake(boolean brake) {
+    public void setDriveBrakeMode(boolean brake) {
 
         m_drive.setNeutralMode(brake ? NeutralMode.Brake : NeutralMode.Coast);
     }
 
-    public void setTurnBrake(boolean brake) {
+    public void setSteerBrakeMode(boolean brake) {
 
         m_turn.setNeutralMode(brake ? NeutralMode.Brake : NeutralMode.Coast);
     }

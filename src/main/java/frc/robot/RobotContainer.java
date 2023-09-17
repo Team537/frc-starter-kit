@@ -1,5 +1,6 @@
 package frc.robot;
 
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 
@@ -15,6 +16,7 @@ public class RobotContainer {
     private Swerve swerve;
     private Mode mode = Mode.SIM;
     private XboxController controller = new XboxController(0);
+    
 
     
 
@@ -28,7 +30,7 @@ public class RobotContainer {
                 new ModuleIOFalcon500(ModulePosition.BACK_RIGHT));
                 break;
             case SIM:
-                swerve = new Swerve( new GyroIO() {}, 
+                swerve = new Swerve(new GyroIOPigeon2() , 
                 new ModuleIOSim(),
                 new ModuleIOSim(),
                 new ModuleIOSim(),
@@ -50,6 +52,10 @@ public class RobotContainer {
 
         );
 
+    }
+
+    public void onDisable(){
+        swerve.stop();
     }
 
     public enum Mode {

@@ -30,5 +30,9 @@ public class GyroIOPigeon2 implements GyroIO{
       inputs.pitchVelocityRadPerSec = Units.degreesToRadians(-xyzDps[0]);
       inputs.yawVelocityRadPerSec = Units.degreesToRadians(xyzDps[2]);
     }
+
+    public void setHeading(double headingRad) {
+      pigeon.getSimCollection().setRawHeading(Units.radiansToDegrees(headingRad));
+    }
     
 }

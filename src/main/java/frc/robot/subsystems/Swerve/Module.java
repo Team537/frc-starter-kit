@@ -31,9 +31,9 @@ public class Module extends SubsystemBase {
     private static double wheelBase = 0.415;
     public static double loopPeriodSecs = 0.02;
 
-    private SimpleMotorFeedforward driveFeedforward = new SimpleMotorFeedforward(1.0, 1.0);
+    private SimpleMotorFeedforward driveFeedforward = new SimpleMotorFeedforward(0.01, 0.5);
   private final PIDController driveFeedback =
-      new PIDController(1, 0.0, 0.0, loopPeriodSecs);
+      new PIDController(0.75, 0.0, 0.0, loopPeriodSecs);
   private final PIDController steerFeedback =
       new PIDController(1, 0.0, 0.0, loopPeriodSecs);
 
@@ -48,6 +48,7 @@ public class Module extends SubsystemBase {
     public void updateInputs() {
         io.updateInputs(inputs);
         Logger.getInstance().processInputs("Module " + position, inputs);
+        
     }
 
     public void setDesiredState(SwerveModuleState state){
@@ -64,9 +65,7 @@ public class Module extends SubsystemBase {
         driveFeedforward.calculate(velocityRadPerSec)
             + driveFeedback.calculate(inputs.driveVelocityRadPerSec, velocityRadPerSec));
 
-        Logger.getInstance().recordOutput("Module " + position + " Angle",  optimizedState.angle.getRadians());
-        Logger.getInstance().recordOutput("Module " + position + " Speed",   driveFeedforward.calculate(velocityRadPerSec)
-        + driveFeedback.calculate(inputs.driveVelocityRadPerSec, velocityRadPerSec));
+       
 
     }
 
