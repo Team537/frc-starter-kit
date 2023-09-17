@@ -3,6 +3,8 @@ package frc.robot.subsystems.Swerve;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
@@ -14,6 +16,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.Gyro.GyroIO;
 import frc.robot.subsystems.Gyro.GyroIOInputsAutoLogged;
@@ -24,7 +27,7 @@ public class Swerve extends SubsystemBase {
 
   
 
-      private Module frontLeftModule;
+        private Module frontLeftModule;
         private Module frontRightModule;
         private Module backLeftModule;
         private Module backRightModule;
@@ -33,7 +36,7 @@ public class Swerve extends SubsystemBase {
         private static double wheelBase = 0.415;
     public static double trackwidthMeters = 0.415;
 
-      private HashMap<ModulePosition, Module> swerveModules;
+      private HashMap<ModulePosition, Module>   swerveModules = new HashMap<ModulePosition, Module>();
 
       private final GyroIO gyroIO;
       private final GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
@@ -54,11 +57,7 @@ public class Swerve extends SubsystemBase {
         ModulePosition.BACK_RIGHT,
         new Translation2d(wheelBase / 2, trackwidthMeters/ 2));
 
-        private final SwerveDrivePoseEstimator odometry = new SwerveDrivePoseEstimator(
-            SWERVE_KINEMATICS,
-            getHeadingRotation2d(),
-            getModulePositions(),
-            new Pose2d());
+        private final SwerveDrivePoseEstimator odometry;
 
     public static final SwerveDriveKinematics SWERVE_KINEMATICS = new SwerveDriveKinematics(
         ModuleMap.orderedValues(MODULE_TRANSLATIONS, new Translation2d[0]));
@@ -82,12 +81,18 @@ public class Swerve extends SubsystemBase {
         swerveModules.put(ModulePosition.BACK_LEFT, backLeftModule);
         swerveModules.put(ModulePosition.BACK_RIGHT, backRightModule);
 
+        odometry = new SwerveDrivePoseEstimator(
+            SWERVE_KINEMATICS,
+            getHeadingRotation2d(),
+            getModulePositions(),
+            new Pose2d());
+
       }
 
       public void setSwerveModuleStatesMap(Map<ModulePosition, SwerveModuleState> moduleStates) {
         SwerveDriveKinematics.desaturateWheelSpeeds(
             ModuleMap.orderedValues(moduleStates, new SwerveModuleState[0]), MAX_SPEED_METERS_PER_SECOND);
-    
+        
         for (Module module : ModuleMap.orderedValuesList(swerveModules))
           module.setDesiredState(moduleStates.get(module.getModulePosition()));
     
@@ -107,10 +112,13 @@ public class Swerve extends SubsystemBase {
           drive, strafe, rotation, getHeadingRotation2d())
           : new ChassisSpeeds(drive, strafe, rotation);
   
+
       // Module States
       Map<ModulePosition, SwerveModuleState> moduleStates = ModuleMap
           .of(SWERVE_KINEMATICS.toSwerveModuleStates(chassisSpeeds));
   
+        Logger.getInstance().recordOutput("Module States", moduleStates.toString());
+
       setSwerveModuleStatesMap(moduleStates);
   
      
@@ -152,5 +160,12 @@ public class Swerve extends SubsystemBase {
       @Override 
       public void periodic() {
         updateOdometry();
+        Logger.getInstance().recordOutput("Pose", getPoseMeters().toString());
+
+        
+        gyroIO.updateInputs(gyroInputs);
+        
+        Logger.getInstance().processInputs("Gyro", gyroInputs);
+        
       }
 }

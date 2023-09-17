@@ -12,12 +12,6 @@ import java.util.*;
 public class ModuleMap {
 
  
-    public enum ModulePosition {
-        FRONT_LEFT,
-        FRONT_RIGHT,
-        BACK_LEFT,
-        BACK_RIGHT
-      }
 
   @SafeVarargs
   public static <V> Map<ModulePosition, V> of(V... values) {

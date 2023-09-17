@@ -7,10 +7,13 @@ package frc.robot;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
-import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+
 import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
+
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -20,6 +23,8 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
  * project.
  */
 public class Robot extends LoggedRobot {
+
+  private RobotContainer m_robotContainer;
   
 
   /**
@@ -52,7 +57,11 @@ public class Robot extends LoggedRobot {
     if (isReal()) {
       logger.addDataReceiver(new WPILOGWriter("/media/sda1/")); // Log to a USB stick
       logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
-    } else {
+    } else if(isSimulation()) {
+      logger.addDataReceiver(new WPILOGWriter("./"));
+      logger.addDataReceiver(new NT4Publisher());
+    }
+    else {
       setUseTiming(false); // Run as fast as possible
       String logPath = LogFileUtil.findReplayLog(); // Pull the replay log from AdvantageScope (or prompt the user)
       logger.setReplaySource(new WPILOGReader(logPath)); // Read replay log
@@ -65,12 +74,20 @@ public class Robot extends LoggedRobot {
     // Start AdvantageKit logger
     logger.start();
 
+    m_robotContainer = new RobotContainer();
+
+  
+    
+
    
   }
 
   /** This function is called periodically during all modes. */
   @Override
   public void robotPeriodic() {
+    CommandScheduler.getInstance().run();
+  
+    SmartDashboard.putData(CommandScheduler.getInstance());
   }
 
   /** This function is called once when autonomous is enabled. */

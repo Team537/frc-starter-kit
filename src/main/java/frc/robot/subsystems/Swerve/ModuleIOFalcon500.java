@@ -1,5 +1,6 @@
 package frc.robot.subsystems.Swerve;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
@@ -8,17 +9,13 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 
 
 import frc.robot.utils.CtreUtils;
+import frc.robot.utils.ModulePosition;
 
 public class ModuleIOFalcon500 implements ModuleIO{
     private final WPI_TalonFX m_drive;
     private final WPI_TalonFX m_turn;
 
-    public enum ModulePosition {
-        FRONT_LEFT,
-        FRONT_RIGHT,
-        BACK_LEFT,
-        BACK_RIGHT
-      }
+  
 
     public static int kFrontLeftDrive = 0;
     public static int kFrontLeftTurn = 1;
@@ -126,13 +123,13 @@ public class ModuleIOFalcon500 implements ModuleIO{
 
     public void setDriveVolts(double volts) {
 
-        m_drive.setVoltage(volts);
+        m_drive.set(ControlMode.PercentOutput, volts / 12);
 
     }
 
     public void setTurnVolts(double volts) {
 
-        m_turn.setVoltage(volts);
+        m_turn.set(ControlMode.PercentOutput, volts / 12);
 
     }
 
