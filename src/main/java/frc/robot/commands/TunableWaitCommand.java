@@ -10,19 +10,22 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.utils.LoggedTunableValue;
 
-
 /**
- * A command that does nothing but takes a specified amount of time to finish. Useful for
- * CommandGroups. Can also be subclassed to make a command with an internal timer.
+ * A command that does nothing but takes a specified amount of time to finish.
+ * Useful for
+ * CommandGroups. Can also be subclassed to make a command with an internal
+ * timer.
  *
- * <p>This class is provided by the NewCommands VendorDep
+ * <p>
+ * This class is provided by the NewCommands VendorDep
  */
 public class TunableWaitCommand extends CommandBase {
   protected Timer m_timer = new Timer();
   private LoggedTunableValue m_duration;
 
   /**
-   * Creates a new WaitCommand. This command will do nothing, and end after the specified duration.
+   * Creates a new WaitCommand. This command will do nothing, and end after the
+   * specified duration.
    *
    * @param seconds the time to wait, in seconds
    */
@@ -36,7 +39,6 @@ public class TunableWaitCommand extends CommandBase {
     m_timer.reset();
     m_timer.start();
 
-    
   }
 
   @Override
@@ -46,7 +48,7 @@ public class TunableWaitCommand extends CommandBase {
 
   @Override
   public boolean isFinished() {
-    return m_timer.hasElapsed( (double) m_duration.getDouble());
+    return m_timer.hasElapsed((double) m_duration.getDouble());
   }
 
   @Override
@@ -57,6 +59,6 @@ public class TunableWaitCommand extends CommandBase {
   @Override
   public void initSendable(SendableBuilder builder) {
     super.initSendable(builder);
-    builder.addDoubleProperty("duration", () ->(double)  m_duration.getDouble(), null);
+    builder.addDoubleProperty("duration", () -> (double) m_duration.getDouble(), null);
   }
 }

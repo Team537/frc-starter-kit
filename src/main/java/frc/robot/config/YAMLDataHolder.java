@@ -13,21 +13,20 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class YAMLDataHolder {
-   private static YAMLDataHolder instance;
-    private Map<String, Object> properties  = loadPropertiesFromFile();
+    private static YAMLDataHolder instance;
+    private Map<String, Object> properties = loadPropertiesFromFile();
     // private boolean tuningMode = (boolean) getProperty("tuningMode");
 
+    public YAMLDataHolder() {
 
-public YAMLDataHolder() {
+    }
 
-}
-
-  public static YAMLDataHolder getInstance() {
-    if (instance == null) {
-        instance = new YAMLDataHolder();
-      }
-      return instance;
-  }
+    public static YAMLDataHolder getInstance() {
+        if (instance == null) {
+            instance = new YAMLDataHolder();
+        }
+        return instance;
+    }
 
     public Object getProperty(String key) {
         return properties.get(key);
@@ -40,8 +39,7 @@ public YAMLDataHolder() {
     public void saveData() {
         savePropertiesToFile();
         System.out.println("Saved data");
-      
-        
+
     }
 
     @SuppressWarnings("unchecked")
@@ -67,21 +65,16 @@ public YAMLDataHolder() {
         }
     }
 
-
     public void init() {
-   
 
     }
 
     public void periodic() {
 
-       
-        
         // if(tuningMode){
-      
+
         // }
         // saveData();
-
 
     }
 }

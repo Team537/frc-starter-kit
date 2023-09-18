@@ -16,8 +16,10 @@ public class SwerveDriveCommand extends CommandBase {
   private final DoubleSupplier strafe;
   private final DoubleSupplier rotation;
   private final Boolean fieldOriented;
+
   /** Creates a new SwerveDriveCommand. */
-  public SwerveDriveCommand(Swerve  swerve, DoubleSupplier forward, DoubleSupplier strafe, DoubleSupplier rotation, Boolean fieldOriented) {
+  public SwerveDriveCommand(Swerve swerve, DoubleSupplier forward, DoubleSupplier strafe, DoubleSupplier rotation,
+      Boolean fieldOriented) {
     this.swerve = swerve;
     this.forward = forward;
     this.strafe = strafe;

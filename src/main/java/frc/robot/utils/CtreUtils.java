@@ -19,8 +19,7 @@ public final class CtreUtils {
     motorConfig.slot0.kI = 0.0;
     motorConfig.slot0.kD = 12.0;
 
-    SupplyCurrentLimitConfiguration supplyCurrentLimit =
-        new SupplyCurrentLimitConfiguration(true, 25, 40, 0.1);
+    SupplyCurrentLimitConfiguration supplyCurrentLimit = new SupplyCurrentLimitConfiguration(true, 25, 40, 0.1);
     motorConfig.supplyCurrLimit = supplyCurrentLimit;
 
     motorConfig.initializationStrategy = SensorInitializationStrategy.BootToZero;
@@ -36,8 +35,7 @@ public final class CtreUtils {
     motorConfig.slot0.kI = 0.0;
     motorConfig.slot0.kD = 0.0;
 
-    SupplyCurrentLimitConfiguration supplyCurrentLimit =
-        new SupplyCurrentLimitConfiguration(true, 35, 60, 0.1);
+    SupplyCurrentLimitConfiguration supplyCurrentLimit = new SupplyCurrentLimitConfiguration(true, 35, 60, 0.1);
     motorConfig.supplyCurrLimit = supplyCurrentLimit;
 
     motorConfig.openloopRamp = 0.25;
@@ -60,8 +58,7 @@ public final class CtreUtils {
 
   public static SwerveModuleState optimize(
       SwerveModuleState desiredState, Rotation2d currentAngle) {
-    double targetAngle =
-        placeInAppropriateScope(currentAngle.getDegrees(), desiredState.angle.getDegrees());
+    double targetAngle = placeInAppropriateScope(currentAngle.getDegrees(), desiredState.angle.getDegrees());
     double targetSpeed = desiredState.speedMetersPerSecond;
     double delta = targetAngle - currentAngle.getDegrees();
     if (Math.abs(delta) > 90) {
@@ -73,7 +70,7 @@ public final class CtreUtils {
 
   /**
    * @param scopeReference Current Angle
-   * @param newAngle Target Angle
+   * @param newAngle       Target Angle
    * @return Closest angle within scope
    */
   private static double placeInAppropriateScope(double scopeReference, double newAngle) {

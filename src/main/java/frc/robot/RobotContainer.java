@@ -18,57 +18,59 @@ public class RobotContainer {
     private Mode mode = Mode.SIM;
     private XboxController controller = new XboxController(0);
     private YAMLDataHolder yamlDataHolder;
-    
-
-    
 
     public RobotContainer() {
 
         yamlDataHolder = YAMLDataHolder.getInstance();
-        switch(mode) {
+        switch (mode) {
             case REAL:
-                swerve = new Swerve( new GyroIOPigeon2(), 
-                new ModuleIOFalcon500(ModulePosition.FRONT_LEFT), 
-                new ModuleIOFalcon500(ModulePosition.FRONT_RIGHT), 
-                new ModuleIOFalcon500(ModulePosition.BACK_LEFT), 
-                new ModuleIOFalcon500(ModulePosition.BACK_RIGHT));
+                swerve = new Swerve(new GyroIOPigeon2(),
+                        new ModuleIOFalcon500(ModulePosition.FRONT_LEFT),
+                        new ModuleIOFalcon500(ModulePosition.FRONT_RIGHT),
+                        new ModuleIOFalcon500(ModulePosition.BACK_LEFT),
+                        new ModuleIOFalcon500(ModulePosition.BACK_RIGHT));
                 break;
             case SIM:
-                swerve = new Swerve(new GyroIOPigeon2() , 
-                new ModuleIOSim(),
-                new ModuleIOSim(),
-                new ModuleIOSim(),
-                new ModuleIOSim());
+                swerve = new Swerve(new GyroIOPigeon2(),
+                        new ModuleIOSim(),
+                        new ModuleIOSim(),
+                        new ModuleIOSim(),
+                        new ModuleIOSim());
                 break;
             default:
-                swerve = new Swerve( new GyroIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {});
-            
+                swerve = new Swerve(new GyroIO() {
+                },
+                        new ModuleIO() {
+                        },
+                        new ModuleIO() {
+                        },
+                        new ModuleIO() {
+                        },
+                        new ModuleIO() {
+                        });
+
                 break;
         }
 
         swerve.setDefaultCommand(
 
-        new SwerveDriveCommand(swerve,
-        () -> -controller.getLeftY(), 
-        () -> controller.getLeftX(), 
-        () -> controller.getRightX(), true)
+                new SwerveDriveCommand(swerve,
+                        () -> -controller.getLeftY(),
+                        () -> controller.getLeftX(),
+                        () -> controller.getRightX(), true)
 
         );
 
     }
 
-    public void onDisable(){
+    public void onDisable() {
         swerve.stop();
         yamlDataHolder.saveData();
-        
+
     }
 
     public void periodic() {
-       
+
     }
 
     public enum Mode {

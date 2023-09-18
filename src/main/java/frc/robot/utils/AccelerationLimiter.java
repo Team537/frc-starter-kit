@@ -19,7 +19,8 @@ public class AccelerationLimiter {
     private double m_prevTime;
 
     /**
-     * Creates a new AccelerationLimiter with the given a acceleration and deceleration rate
+     * Creates a new AccelerationLimiter with the given a acceleration and
+     * deceleration rate
      * limits and initial value.
      *
      * @param accelerationLimit The rate-of-change limit away from zero in units per
@@ -36,7 +37,8 @@ public class AccelerationLimiter {
     }
 
     /**
-     * Creates a new AccelerationLimiter with the given a acceleration and deceleration rate
+     * Creates a new AccelerationLimiter with the given a acceleration and
+     * deceleration rate
      * limits.
      *
      * @param accelerationLimit The rate-of-change limit away from zero in units per

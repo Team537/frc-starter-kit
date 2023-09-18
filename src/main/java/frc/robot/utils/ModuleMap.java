@@ -2,16 +2,12 @@ package frc.robot.utils;
 
 import java.util.*;
 
-
-
-
 /**
- * Contains functions to convert {@link Map}s with {@link ModulePosition} keys to and from arrays so
+ * Contains functions to convert {@link Map}s with {@link ModulePosition} keys
+ * to and from arrays so
  * that it's easier to use WPILib swerve functions.
  */
 public class ModuleMap {
-
- 
 
   @SafeVarargs
   public static <V> Map<ModulePosition, V> of(V... values) {
@@ -22,7 +18,6 @@ public class ModuleMap {
     return map;
   }
 
- 
   public static <V> List<V> orderedValuesList(Map<ModulePosition, V> map) {
     ArrayList<V> list = new ArrayList<>();
     for (ModulePosition i : ModulePosition.values()) {
@@ -31,7 +26,6 @@ public class ModuleMap {
     return list;
   }
 
- 
   public static <V> V[] orderedValues(Map<ModulePosition, V> map, V[] array) {
     return orderedValuesList(map).toArray(array);
   }

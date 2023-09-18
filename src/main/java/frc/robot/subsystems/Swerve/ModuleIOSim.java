@@ -11,36 +11,28 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import frc.robot.utils.LoggedTunableValue;
 
-
-
-
 public class ModuleIOSim implements ModuleIO {
-    
+
     public LoggedTunableValue DRIVE_MOTOR_GEAR_RATIO = new LoggedTunableValue("DRIVE_MOTOR_GEAR_RATIO");
     public LoggedTunableValue STEER_MOTOR_GEAR_RATIO = new LoggedTunableValue("STEER_MOTOR_GEAR_RATIO");
-   
+
     public LoggedTunableValue LOOP_PERIOD_SECONDS = new LoggedTunableValue("LOOP_PERIOD_SECONDS");
-    
+
     private FlywheelSim driveSim = new FlywheelSim(DCMotor.getFalcon500(1), DRIVE_MOTOR_GEAR_RATIO.getDouble(), 0.02);
     private FlywheelSim turnSim = new FlywheelSim(DCMotor.getFalcon500(1), STEER_MOTOR_GEAR_RATIO.getDouble(),
             0.03);
 
-        
     public double turnPositionRad = 0;
     public double turnAbsolutePositionRad = 0;
     public double driveVolts = 0;
     public double turnVolts = 0;
 
-   
-
     public void updateInputs(ModuleIOInputs inputs) {
         updateTunableNumbers();
-       
+
         driveSim.update(LOOP_PERIOD_SECONDS.getDouble());
         turnSim.update(LOOP_PERIOD_SECONDS.getDouble());
-        
-        
-        
+
         double angleDiffRad = turnSim.getAngularVelocityRadPerSec() * LOOP_PERIOD_SECONDS.getDouble();
         turnAbsolutePositionRad += angleDiffRad;
         turnPositionRad += angleDiffRad;
@@ -52,8 +44,6 @@ public class ModuleIOSim implements ModuleIO {
         while (turnAbsolutePositionRad > 0) {
             turnAbsolutePositionRad -= 2.0 * Math.PI;
         }
-
-      
 
         inputs.drivePositionRad = inputs.drivePositionRad
                 + (driveSim.getAngularVelocityRadPerSec() * LOOP_PERIOD_SECONDS.getDouble());
@@ -70,21 +60,19 @@ public class ModuleIOSim implements ModuleIO {
         inputs.steerTemperatureCelcius = new double[] {};
         Unmanaged.feedEnable(20);
 
-       
-
     }
 
     public void setDriveVoltage(double volts) {
-        
+
         driveVolts = MathUtil.clamp(volts, -12.0, 12.0);
-       
+
         driveSim.setInputVoltage(driveVolts);
 
     }
 
     public void setSteerVoltage(double volts) {
-    
-        turnVolts  = MathUtil.clamp(volts, -12.0, 12.0);
+
+        turnVolts = MathUtil.clamp(volts, -12.0, 12.0);
         turnSim.setInputVoltage(turnVolts);
 
     }
@@ -95,5 +83,4 @@ public class ModuleIOSim implements ModuleIO {
         LOOP_PERIOD_SECONDS.periodic();
     }
 
-   
 }

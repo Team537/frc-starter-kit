@@ -25,7 +25,6 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 public class Robot extends LoggedRobot {
 
   private RobotContainer m_robotContainer;
-  
 
   /**
    * This function is run when the robot is first started up and should be used
@@ -57,11 +56,10 @@ public class Robot extends LoggedRobot {
     if (isReal()) {
       logger.addDataReceiver(new WPILOGWriter("/media/sda1/")); // Log to a USB stick
       logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
-    } else if(isSimulation()) {
+    } else if (isSimulation()) {
       logger.addDataReceiver(new WPILOGWriter("./"));
       logger.addDataReceiver(new NT4Publisher());
-    }
-    else {
+    } else {
       setUseTiming(false); // Run as fast as possible
       String logPath = LogFileUtil.findReplayLog(); // Pull the replay log from AdvantageScope (or prompt the user)
       logger.setReplaySource(new WPILOGReader(logPath)); // Read replay log
@@ -76,31 +74,26 @@ public class Robot extends LoggedRobot {
 
     m_robotContainer = new RobotContainer();
 
-  
-    
-
-   
   }
 
   /** This function is called periodically during all modes. */
   @Override
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
-  m_robotContainer.periodic();
+    m_robotContainer.periodic();
     SmartDashboard.putData(CommandScheduler.getInstance());
   }
 
   /** This function is called once when autonomous is enabled. */
   @Override
   public void autonomousInit() {
-   
+
   }
 
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {
-   
-    
+
   }
 
   /** This function is called once when teleop is enabled. */
@@ -143,7 +136,7 @@ public class Robot extends LoggedRobot {
   @Override
   public void simulationPeriodic() {
     CommandScheduler.getInstance().run();
-  
+
     SmartDashboard.putData(CommandScheduler.getInstance());
   }
 }

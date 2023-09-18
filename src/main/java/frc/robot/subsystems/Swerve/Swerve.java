@@ -28,209 +28,199 @@ import frc.robot.utils.ModulePosition;
 
 public class Swerve extends SubsystemBase {
 
-  
+  private Module frontLeftModule;
+  private Module frontRightModule;
+  private Module backLeftModule;
+  private Module backRightModule;
 
-        private Module frontLeftModule;
-        private Module frontRightModule;
-        private Module backLeftModule;
-        private Module backRightModule;
+  private LoggedTunableValue MAX_SPEED_METERS_PER_SECOND = new LoggedTunableValue("MAX_SPEED_METERS_PER_SECOND");
+  private LoggedTunableValue MAX_ROTATION_RADIANS_PER_SECOND = new LoggedTunableValue(
+      "MAX_ROTATION_RADIANS_PER_SECOND");
+  private LoggedTunableValue WHEEL_RADIUS_METERS = new LoggedTunableValue("WHEEL_RADIUS_METERS");
+  private LoggedTunableValue TRACK_WIDTH_METERS = new LoggedTunableValue("TRACK_WIDTH_METERS");
 
-        
-        
-        private LoggedTunableValue MAX_SPEED_METERS_PER_SECOND = new LoggedTunableValue("MAX_SPEED_METERS_PER_SECOND");
-        private LoggedTunableValue MAX_ROTATION_RADIANS_PER_SECOND = new LoggedTunableValue("MAX_ROTATION_RADIANS_PER_SECOND");
-        private LoggedTunableValue WHEEL_RADIUS_METERS = new LoggedTunableValue("WHEEL_RADIUS_METERS");
-        private LoggedTunableValue TRACK_WIDTH_METERS = new LoggedTunableValue("TRACK_WIDTH_METERS");
+  private double simYaw = 0;
 
+  private HashMap<ModulePosition, Module> swerveModules = new HashMap<ModulePosition, Module>();
 
-        private double simYaw = 0;
+  private final GyroIO gyroIO;
+  private final GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
 
-      private HashMap<ModulePosition, Module>   swerveModules = new HashMap<ModulePosition, Module>();
+  public Map<ModulePosition, Translation2d> MODULE_TRANSLATIONS;
 
-      private final GyroIO gyroIO;
-      private final GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
+  private SwerveDrivePoseEstimator odometry;
 
+  public SwerveDriveKinematics SWERVE_KINEMATICS;
 
-      public  Map<ModulePosition, Translation2d> MODULE_TRANSLATIONS;
-
-        private SwerveDrivePoseEstimator odometry;
-
-    public SwerveDriveKinematics SWERVE_KINEMATICS;
-   
-
-      public Swerve(GyroIO gyroIO,  ModuleIO flModuleIO,
+  public Swerve(GyroIO gyroIO, ModuleIO flModuleIO,
       ModuleIO frModuleIO,
       ModuleIO blModuleIO,
       ModuleIO brModuleIO) {
 
-        MODULE_TRANSLATIONS = Map.of(
+    MODULE_TRANSLATIONS = Map.of(
         ModulePosition.FRONT_LEFT,
-        new Translation2d(-WHEEL_RADIUS_METERS.getDouble()/ 2,TRACK_WIDTH_METERS.getDouble() / 2),
+        new Translation2d(-WHEEL_RADIUS_METERS.getDouble() / 2, TRACK_WIDTH_METERS.getDouble() / 2),
         ModulePosition.FRONT_RIGHT,
         new Translation2d(-WHEEL_RADIUS_METERS.getDouble() / 2, -TRACK_WIDTH_METERS.getDouble() / 2),
         ModulePosition.BACK_LEFT,
         new Translation2d(WHEEL_RADIUS_METERS.getDouble() / 2, -TRACK_WIDTH_METERS.getDouble() / 2),
         ModulePosition.BACK_RIGHT,
-        new Translation2d(WHEEL_RADIUS_METERS.getDouble() / 2, TRACK_WIDTH_METERS.getDouble()/ 2));
+        new Translation2d(WHEEL_RADIUS_METERS.getDouble() / 2, TRACK_WIDTH_METERS.getDouble() / 2));
 
-        SWERVE_KINEMATICS = new SwerveDriveKinematics(
+    SWERVE_KINEMATICS = new SwerveDriveKinematics(
         ModuleMap.orderedValues(MODULE_TRANSLATIONS, new Translation2d[0]));
 
-        this.gyroIO = gyroIO;
+    this.gyroIO = gyroIO;
 
-        frontLeftModule = new Module(flModuleIO, ModulePosition.FRONT_LEFT  );
-        frontRightModule = new Module(frModuleIO, ModulePosition.FRONT_RIGHT);
-        backLeftModule = new Module(blModuleIO, ModulePosition.BACK_LEFT);
-        backRightModule = new Module(brModuleIO, ModulePosition.BACK_RIGHT);
+    frontLeftModule = new Module(flModuleIO, ModulePosition.FRONT_LEFT);
+    frontRightModule = new Module(frModuleIO, ModulePosition.FRONT_RIGHT);
+    backLeftModule = new Module(blModuleIO, ModulePosition.BACK_LEFT);
+    backRightModule = new Module(brModuleIO, ModulePosition.BACK_RIGHT);
 
-        swerveModules = new HashMap<ModulePosition, Module>();
-        swerveModules.put(ModulePosition.FRONT_LEFT, frontLeftModule);
-        swerveModules.put(ModulePosition.FRONT_RIGHT, frontRightModule);
-        swerveModules.put(ModulePosition.BACK_LEFT, backLeftModule);
-        swerveModules.put(ModulePosition.BACK_RIGHT, backRightModule);
+    swerveModules = new HashMap<ModulePosition, Module>();
+    swerveModules.put(ModulePosition.FRONT_LEFT, frontLeftModule);
+    swerveModules.put(ModulePosition.FRONT_RIGHT, frontRightModule);
+    swerveModules.put(ModulePosition.BACK_LEFT, backLeftModule);
+    swerveModules.put(ModulePosition.BACK_RIGHT, backRightModule);
 
-        odometry = new SwerveDrivePoseEstimator(
-            SWERVE_KINEMATICS,
-            getHeadingRotation2d(),
-            getModulePositions(),
-            new Pose2d());
+    odometry = new SwerveDrivePoseEstimator(
+        SWERVE_KINEMATICS,
+        getHeadingRotation2d(),
+        getModulePositions(),
+        new Pose2d());
 
-      }
+  }
 
-      public void setSwerveModuleStatesMap(Map<ModulePosition, SwerveModuleState> moduleStates) {
-        SwerveDriveKinematics.desaturateWheelSpeeds(
-            ModuleMap.orderedValues(moduleStates, new SwerveModuleState[0]), MAX_SPEED_METERS_PER_SECOND.getDouble());
-        
-        for (Module module : ModuleMap.orderedValuesList(swerveModules))
-          module.setDesiredState(moduleStates.get(module.getModulePosition()));
-    
-      }
+  public void setSwerveModuleStatesMap(Map<ModulePosition, SwerveModuleState> moduleStates) {
+    SwerveDriveKinematics.desaturateWheelSpeeds(
+        ModuleMap.orderedValues(moduleStates, new SwerveModuleState[0]), MAX_SPEED_METERS_PER_SECOND.getDouble());
 
-      public void drive(
-        double drive,
-        double strafe,
-        double rotation,
-        boolean isFieldRelative) {
-      drive *= MAX_SPEED_METERS_PER_SECOND.getDouble();
-      strafe *= MAX_SPEED_METERS_PER_SECOND.getDouble();
-      rotation *= MAX_ROTATION_RADIANS_PER_SECOND.getDouble();
-  
-      // Chassis Speed
-      ChassisSpeeds chassisSpeeds = isFieldRelative ? ChassisSpeeds.fromFieldRelativeSpeeds(
-          drive, strafe, rotation, getHeadingRotation2d())
-          : new ChassisSpeeds(drive, strafe, rotation);
-  
+    for (Module module : ModuleMap.orderedValuesList(swerveModules))
+      module.setDesiredState(moduleStates.get(module.getModulePosition()));
 
-      // Module States
-      Map<ModulePosition, SwerveModuleState> moduleStates = ModuleMap
-          .of(SWERVE_KINEMATICS.toSwerveModuleStates(chassisSpeeds));
-  
+  }
 
-      setSwerveModuleStatesMap(moduleStates);
-  
-     
+  public void drive(
+      double drive,
+      double strafe,
+      double rotation,
+      boolean isFieldRelative) {
+    drive *= MAX_SPEED_METERS_PER_SECOND.getDouble();
+    strafe *= MAX_SPEED_METERS_PER_SECOND.getDouble();
+    rotation *= MAX_ROTATION_RADIANS_PER_SECOND.getDouble();
+
+    // Chassis Speed
+    ChassisSpeeds chassisSpeeds = isFieldRelative ? ChassisSpeeds.fromFieldRelativeSpeeds(
+        drive, strafe, rotation, getHeadingRotation2d())
+        : new ChassisSpeeds(drive, strafe, rotation);
+
+    // Module States
+    Map<ModulePosition, SwerveModuleState> moduleStates = ModuleMap
+        .of(SWERVE_KINEMATICS.toSwerveModuleStates(chassisSpeeds));
+
+    setSwerveModuleStatesMap(moduleStates);
+
+  }
+
+  public Rotation2d getHeadingRotation2d() {
+    return Rotation2d.fromRadians(gyroInputs.yawPositionRad);
+  }
+
+  public void stop() {
+    for (Module module : ModuleMap.orderedValuesList(swerveModules)) {
+      module.stop();
+    }
+  }
+
+  public SwerveModulePosition[] getModulePositions() {
+    return new SwerveModulePosition[] {
+        swerveModules.get(ModulePosition.FRONT_LEFT).getPosition(),
+        swerveModules.get(ModulePosition.FRONT_RIGHT).getPosition(),
+        swerveModules.get(ModulePosition.BACK_LEFT).getPosition(),
+        swerveModules.get(ModulePosition.BACK_RIGHT).getPosition()
+    };
+  }
+
+  public Pose2d getPoseMeters() {
+    return odometry.getEstimatedPosition();
+  }
+
+  public void updateOdometry() {
+    odometry.update(
+        getHeadingRotation2d(),
+        getModulePositions());
+
+    for (Module module : ModuleMap.orderedValuesList(swerveModules)) {
+      Translation2d modulePositionFromChassis = MODULE_TRANSLATIONS
+          .get(module.getModulePosition())
+          .rotateBy(getHeadingRotation2d())
+          .plus(getPoseMeters().getTranslation());
+      module.setModulePose(
+          new Pose2d(
+              modulePositionFromChassis,
+              module.getHeadingRotation2d().plus(getHeadingRotation2d())));
+    }
+  }
+
+  public Map<ModulePosition, SwerveModuleState> getModuleStates() {
+    Map<ModulePosition, SwerveModuleState> map = new HashMap<>();
+    for (ModulePosition i : swerveModules.keySet()) {
+      map.put(i, swerveModules.get(i).getState());
+    }
+    return map;
+  }
+
+  public void updateTunableNumbers() {
+
+    if (TRACK_WIDTH_METERS.hasChanged(hashCode()) || WHEEL_RADIUS_METERS.hasChanged(hashCode())) {
+      MODULE_TRANSLATIONS = Map.of(
+          ModulePosition.FRONT_LEFT,
+          new Translation2d(-WHEEL_RADIUS_METERS.getDouble() / 2, TRACK_WIDTH_METERS.getDouble() / 2),
+          ModulePosition.FRONT_RIGHT,
+          new Translation2d(-WHEEL_RADIUS_METERS.getDouble() / 2, -TRACK_WIDTH_METERS.getDouble() / 2),
+          ModulePosition.BACK_LEFT,
+          new Translation2d(WHEEL_RADIUS_METERS.getDouble() / 2, -TRACK_WIDTH_METERS.getDouble() / 2),
+          ModulePosition.BACK_RIGHT,
+          new Translation2d(WHEEL_RADIUS_METERS.getDouble() / 2, TRACK_WIDTH_METERS.getDouble() / 2));
+
+      SWERVE_KINEMATICS = new SwerveDriveKinematics(
+          ModuleMap.orderedValues(MODULE_TRANSLATIONS, new Translation2d[0]));
+
+      // odometry = new SwerveDrivePoseEstimator(
+      // SWERVE_KINEMATICS,
+      // getHeadingRotation2d(),
+      // getModulePositions(),
+      // new Pose2d());
     }
 
-    
-    public Rotation2d getHeadingRotation2d() {
-        return Rotation2d.fromRadians(gyroInputs.yawPositionRad);
-      }
+    MAX_SPEED_METERS_PER_SECOND.periodic();
+    MAX_ROTATION_RADIANS_PER_SECOND.periodic();
+    TRACK_WIDTH_METERS.periodic();
+    WHEEL_RADIUS_METERS.periodic();
+  }
 
-      public void stop(){
-        for(Module module : ModuleMap.orderedValuesList(swerveModules)){
-          module.stop();
-        }
-      }
-    
-    public SwerveModulePosition[] getModulePositions() {
-        return new SwerveModulePosition[] {
-            swerveModules.get(ModulePosition.FRONT_LEFT).getPosition(),
-            swerveModules.get(ModulePosition.FRONT_RIGHT).getPosition(),
-            swerveModules.get(ModulePosition.BACK_LEFT).getPosition(),
-            swerveModules.get(ModulePosition.BACK_RIGHT).getPosition()
-        };
-      }
+  @Override
+  public void periodic() {
+    updateTunableNumbers();
+    ChassisSpeeds chassisSpeed = SWERVE_KINEMATICS.toChassisSpeeds(
+        ModuleMap.orderedValues(getModuleStates(), new SwerveModuleState[0]));
+    updateOdometry();
+    // Logger.getInstance().recordOutput("Pose", getPoseMeters().toString());
+    SmartDashboard.putNumber("Odo X", odometry.getEstimatedPosition().getX());
+    SmartDashboard.putNumber("Odo Y", odometry.getEstimatedPosition().getY());
+    SmartDashboard.putNumber("Odo Yaw", odometry.getEstimatedPosition().getRotation().getDegrees());
 
-      public Pose2d getPoseMeters() {
-        return odometry.getEstimatedPosition();
-      }
+    SmartDashboard.putString("Gyro Angle", getHeadingRotation2d().toString());
+    Unmanaged.feedEnable(20);
+    simYaw += chassisSpeed.omegaRadiansPerSecond * 0.02;
+    gyroIO.setHeading(simYaw);
 
-      public void updateOdometry() {
-        odometry.update(
-            getHeadingRotation2d(),
-            getModulePositions());
-    
-        for (Module module : ModuleMap.orderedValuesList(swerveModules)) {
-          Translation2d modulePositionFromChassis = MODULE_TRANSLATIONS
-              .get(module.getModulePosition())
-              .rotateBy(getHeadingRotation2d())
-              .plus(getPoseMeters().getTranslation());
-          module.setModulePose(
-              new Pose2d(
-                  modulePositionFromChassis,
-                  module.getHeadingRotation2d().plus(getHeadingRotation2d())));
-        }
-      }
+    gyroIO.updateInputs(gyroInputs);
 
-      public Map<ModulePosition, SwerveModuleState> getModuleStates() {
-        Map<ModulePosition, SwerveModuleState> map = new HashMap<>();
-        for (ModulePosition i : swerveModules.keySet()) {
-          map.put(i, swerveModules.get(i).getState());
-        }
-        return map;
-      }
+    Logger.getInstance().recordOutput("Swerve Pose", getPoseMeters());
+    Logger.getInstance().recordOutput("ModuleStates",
+        ModuleMap.orderedValues(getModuleStates(), new SwerveModuleState[0]));
+    Logger.getInstance().processInputs("Gyro", gyroInputs);
 
-      public void updateTunableNumbers(){
-
-        if(TRACK_WIDTH_METERS.hasChanged(hashCode()) || WHEEL_RADIUS_METERS.hasChanged(hashCode())){
-          MODULE_TRANSLATIONS = Map.of(
-        ModulePosition.FRONT_LEFT,
-        new Translation2d(-WHEEL_RADIUS_METERS.getDouble() / 2,TRACK_WIDTH_METERS.getDouble() / 2),
-        ModulePosition.FRONT_RIGHT,
-        new Translation2d(-WHEEL_RADIUS_METERS.getDouble() / 2, -TRACK_WIDTH_METERS.getDouble() / 2),
-        ModulePosition.BACK_LEFT,
-        new Translation2d(WHEEL_RADIUS_METERS.getDouble() / 2, -TRACK_WIDTH_METERS.getDouble() / 2),
-        ModulePosition.BACK_RIGHT,
-        new Translation2d(WHEEL_RADIUS_METERS.getDouble() / 2, TRACK_WIDTH_METERS.getDouble()/ 2));
-
-        SWERVE_KINEMATICS = new SwerveDriveKinematics(
-        ModuleMap.orderedValues(MODULE_TRANSLATIONS, new Translation2d[0]));
-
-        // odometry = new SwerveDrivePoseEstimator(
-        //   SWERVE_KINEMATICS,
-        //   getHeadingRotation2d(),
-        //   getModulePositions(),
-        //   new Pose2d());
-        }
-
-
-        MAX_SPEED_METERS_PER_SECOND.periodic();
-        MAX_ROTATION_RADIANS_PER_SECOND.periodic();
-        TRACK_WIDTH_METERS.periodic();
-        WHEEL_RADIUS_METERS.periodic();
-      }
-
-      @Override 
-      public void periodic() {
-        updateTunableNumbers();
-        ChassisSpeeds chassisSpeed = SWERVE_KINEMATICS.toChassisSpeeds(
-          ModuleMap.orderedValues(getModuleStates(), new SwerveModuleState[0]));
-        updateOdometry();
-        // Logger.getInstance().recordOutput("Pose", getPoseMeters().toString());
-        SmartDashboard.putNumber("Odo X", odometry.getEstimatedPosition().getX());
-        SmartDashboard.putNumber("Odo Y", odometry.getEstimatedPosition().getY());
-        SmartDashboard.putNumber("Odo Yaw", odometry.getEstimatedPosition().getRotation().getDegrees());
-
-        SmartDashboard.putString("Gyro Angle", getHeadingRotation2d().toString());
-        Unmanaged.feedEnable(20);
-        simYaw += chassisSpeed.omegaRadiansPerSecond * 0.02;
-        gyroIO.setHeading(simYaw);
-        
-        gyroIO.updateInputs(gyroInputs);
-       
-        Logger.getInstance().recordOutput("Swerve Pose", getPoseMeters());
-        Logger.getInstance().recordOutput("ModuleStates", ModuleMap.orderedValues(getModuleStates(), new SwerveModuleState[0]));
-        Logger.getInstance().processInputs("Gyro", gyroInputs);
-        
-      }
+  }
 }

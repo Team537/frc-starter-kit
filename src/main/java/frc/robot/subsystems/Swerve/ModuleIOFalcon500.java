@@ -7,17 +7,14 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 
-
 import frc.robot.utils.CtreUtils;
 import frc.robot.utils.LoggedTunableValue;
 import frc.robot.utils.ModulePosition;
 
-public class ModuleIOFalcon500 implements ModuleIO{
+public class ModuleIOFalcon500 implements ModuleIO {
     private WPI_TalonFX driveMotor;
     private WPI_TalonFX steerMotor;
     private final ModulePosition position;
-
-  
 
     public LoggedTunableValue FRONT_LEFT_DRIVE_MOTOR_ID = new LoggedTunableValue("FRONT_LEFT_DRIVE_MOTOR_ID");
     public LoggedTunableValue FRONT_LEFT_STEER_MOTOR_ID = new LoggedTunableValue("FRONT_LEFT_STEER_MOTOR_ID");
@@ -33,42 +30,39 @@ public class ModuleIOFalcon500 implements ModuleIO{
     public LoggedTunableValue FRONT_RIGHT_DRIVE_INVERTED = new LoggedTunableValue("FRONT_RIGHT_DRIVE_INVERTED");
     public LoggedTunableValue FRONT_RIGHT_STEER_INVERTED = new LoggedTunableValue("FRONT_RIGHT_STEER_INVERTED");
     public LoggedTunableValue BACK_LEFT_DRIVE_INVERTED = new LoggedTunableValue("BACK_LEFT_DRIVE_INVERTED");
-    public LoggedTunableValue BACK_LEFT_STEER_INVERTED = new LoggedTunableValue("BACK_LEFT_STEER_INVERTED"); 
+    public LoggedTunableValue BACK_LEFT_STEER_INVERTED = new LoggedTunableValue("BACK_LEFT_STEER_INVERTED");
     public LoggedTunableValue BACK_RIGHT_DRIVE_INVERTED = new LoggedTunableValue("BACK_RIGHT_DRIVE_INVERTED");
     public LoggedTunableValue BACK_RIGHT_STEER_INVERTED = new LoggedTunableValue("BACK_RIGHT_STEER_INVERTED");
 
     public LoggedTunableValue DRIVE_MOTOR_GEAR_RATIO = new LoggedTunableValue("DRIVE_MOTOR_GEAR_RATIO");
     public LoggedTunableValue STEER_MOTOR_GEAR_RATIO = new LoggedTunableValue("STEER_MOTOR_GEAR_RATIO");
 
-    
     private LoggedTunableValue TRACK_WIDTH_METERS = new LoggedTunableValue("TRACK_WIDTH_METERS");
     private LoggedTunableValue WHEEL_RADIUS_METERS = new LoggedTunableValue("WHEEL_RADIUS_METERS");
 
     public static Translation2d[] MODULE_TRANSLATIONS;
-    
 
     public static SwerveDriveKinematics DRIVE_KINEMATICS;
 
     public ModuleIOFalcon500(ModulePosition modulePosition) {
         this.position = modulePosition;
         MODULE_TRANSLATIONS = new Translation2d[] {
-    
-            new Translation2d( -WHEEL_RADIUS_METERS.getDouble() / 2,  TRACK_WIDTH_METERS.getDouble() / 2),
-            
-            new Translation2d(-WHEEL_RADIUS_METERS.getDouble() / 2,  TRACK_WIDTH_METERS.getDouble() / 2),
-            
-            new Translation2d(-WHEEL_RADIUS_METERS.getDouble() / 2, -TRACK_WIDTH_METERS.getDouble() / 2),
-            
-            new Translation2d(-WHEEL_RADIUS_METERS.getDouble() / 2, TRACK_WIDTH_METERS.getDouble() / 2)};
 
-            DRIVE_KINEMATICS =  new SwerveDriveKinematics(MODULE_TRANSLATIONS);
+                new Translation2d(-WHEEL_RADIUS_METERS.getDouble() / 2, TRACK_WIDTH_METERS.getDouble() / 2),
 
-       
+                new Translation2d(-WHEEL_RADIUS_METERS.getDouble() / 2, TRACK_WIDTH_METERS.getDouble() / 2),
+
+                new Translation2d(-WHEEL_RADIUS_METERS.getDouble() / 2, -TRACK_WIDTH_METERS.getDouble() / 2),
+
+                new Translation2d(-WHEEL_RADIUS_METERS.getDouble() / 2, TRACK_WIDTH_METERS.getDouble() / 2) };
+
+        DRIVE_KINEMATICS = new SwerveDriveKinematics(MODULE_TRANSLATIONS);
+
         switch (position) {
 
             case FRONT_LEFT:
-                driveMotor = new WPI_TalonFX( (int) FRONT_LEFT_DRIVE_MOTOR_ID.getInteger());
-                steerMotor = new WPI_TalonFX( (int) FRONT_LEFT_STEER_MOTOR_ID.getInteger());
+                driveMotor = new WPI_TalonFX((int) FRONT_LEFT_DRIVE_MOTOR_ID.getInteger());
+                steerMotor = new WPI_TalonFX((int) FRONT_LEFT_STEER_MOTOR_ID.getInteger());
                 driveMotor.setInverted((Boolean) FRONT_LEFT_DRIVE_INVERTED.getBool());
                 steerMotor.setInverted((Boolean) FRONT_LEFT_STEER_INVERTED.getBool());
                 break;
@@ -127,7 +121,7 @@ public class ModuleIOFalcon500 implements ModuleIO{
 
         // Multiply 10 because Selected Sensor Velocity is measured per 100 ms
         inputs.steerVelocityRadPerSec = steerMotor.getSelectedSensorVelocity() * 10 * 2 * Math.PI
-                / (2048 *(double) STEER_MOTOR_GEAR_RATIO.getDouble());
+                / (2048 * (double) STEER_MOTOR_GEAR_RATIO.getDouble());
 
         inputs.steerAppliedVolts = steerMotor.getMotorOutputVoltage() * steerMotor.getBusVoltage();
         inputs.steerCurrentAmps = new double[] { steerMotor.getSupplyCurrent() };
@@ -136,102 +130,102 @@ public class ModuleIOFalcon500 implements ModuleIO{
 
     public void updateTunableNumbers() {
 
-        if(
-            FRONT_LEFT_DRIVE_MOTOR_ID.hasChanged(hashCode()) || 
-        FRONT_LEFT_DRIVE_INVERTED.hasChanged(hashCode()) || 
-        FRONT_LEFT_STEER_MOTOR_ID.hasChanged(hashCode()) || 
-        FRONT_LEFT_STEER_INVERTED.hasChanged(hashCode()) || 
-        FRONT_RIGHT_DRIVE_MOTOR_ID.hasChanged(hashCode()) || 
-        FRONT_RIGHT_DRIVE_INVERTED.hasChanged(hashCode()) || 
-        FRONT_RIGHT_STEER_MOTOR_ID.hasChanged(hashCode()) || 
-        FRONT_RIGHT_STEER_INVERTED.hasChanged(hashCode()) || 
-        BACK_LEFT_DRIVE_MOTOR_ID.hasChanged(hashCode()) || 
-        BACK_LEFT_DRIVE_INVERTED.hasChanged(hashCode()) || 
-        BACK_LEFT_STEER_MOTOR_ID.hasChanged(hashCode()) || 
-        BACK_LEFT_STEER_INVERTED.hasChanged(hashCode()) || 
-        BACK_RIGHT_DRIVE_MOTOR_ID.hasChanged(hashCode()) || 
-        BACK_RIGHT_DRIVE_INVERTED.hasChanged(hashCode()) || 
-        BACK_RIGHT_STEER_MOTOR_ID.hasChanged(hashCode()) || 
-        BACK_RIGHT_STEER_INVERTED.hasChanged(hashCode())) {
+        if (FRONT_LEFT_DRIVE_MOTOR_ID.hasChanged(hashCode()) ||
+                FRONT_LEFT_DRIVE_INVERTED.hasChanged(hashCode()) ||
+                FRONT_LEFT_STEER_MOTOR_ID.hasChanged(hashCode()) ||
+                FRONT_LEFT_STEER_INVERTED.hasChanged(hashCode()) ||
+                FRONT_RIGHT_DRIVE_MOTOR_ID.hasChanged(hashCode()) ||
+                FRONT_RIGHT_DRIVE_INVERTED.hasChanged(hashCode()) ||
+                FRONT_RIGHT_STEER_MOTOR_ID.hasChanged(hashCode()) ||
+                FRONT_RIGHT_STEER_INVERTED.hasChanged(hashCode()) ||
+                BACK_LEFT_DRIVE_MOTOR_ID.hasChanged(hashCode()) ||
+                BACK_LEFT_DRIVE_INVERTED.hasChanged(hashCode()) ||
+                BACK_LEFT_STEER_MOTOR_ID.hasChanged(hashCode()) ||
+                BACK_LEFT_STEER_INVERTED.hasChanged(hashCode()) ||
+                BACK_RIGHT_DRIVE_MOTOR_ID.hasChanged(hashCode()) ||
+                BACK_RIGHT_DRIVE_INVERTED.hasChanged(hashCode()) ||
+                BACK_RIGHT_STEER_MOTOR_ID.hasChanged(hashCode()) ||
+                BACK_RIGHT_STEER_INVERTED.hasChanged(hashCode())) {
             switch (position) {
 
                 case FRONT_LEFT:
-                    driveMotor = new WPI_TalonFX( (int) FRONT_LEFT_DRIVE_MOTOR_ID.getInteger());
-                    steerMotor = new WPI_TalonFX( (int) FRONT_LEFT_STEER_MOTOR_ID.getInteger());
-                    driveMotor.setInverted( FRONT_LEFT_DRIVE_INVERTED.getBool());
-                    steerMotor.setInverted( FRONT_LEFT_STEER_INVERTED.getBool());
+                    driveMotor = new WPI_TalonFX((int) FRONT_LEFT_DRIVE_MOTOR_ID.getInteger());
+                    steerMotor = new WPI_TalonFX((int) FRONT_LEFT_STEER_MOTOR_ID.getInteger());
+                    driveMotor.setInverted(FRONT_LEFT_DRIVE_INVERTED.getBool());
+                    steerMotor.setInverted(FRONT_LEFT_STEER_INVERTED.getBool());
                     break;
-    
+
                 case FRONT_RIGHT:
                     driveMotor = new WPI_TalonFX((int) FRONT_RIGHT_DRIVE_MOTOR_ID.getInteger());
                     steerMotor = new WPI_TalonFX((int) FRONT_RIGHT_STEER_MOTOR_ID.getInteger());
-                    driveMotor.setInverted( FRONT_RIGHT_DRIVE_INVERTED.getBool());
-                    steerMotor.setInverted( FRONT_RIGHT_STEER_INVERTED.getBool());
+                    driveMotor.setInverted(FRONT_RIGHT_DRIVE_INVERTED.getBool());
+                    steerMotor.setInverted(FRONT_RIGHT_STEER_INVERTED.getBool());
                     break;
                 case BACK_LEFT:
                     driveMotor = new WPI_TalonFX((int) BACK_LEFT_DRIVE_MOTOR_ID.getInteger());
                     steerMotor = new WPI_TalonFX((int) BACK_LEFT_STEER_MOTOR_ID.getInteger());
-                    driveMotor.setInverted( BACK_LEFT_DRIVE_INVERTED.getBool());
-                    steerMotor.setInverted( BACK_LEFT_STEER_INVERTED.getBool());
-    
+                    driveMotor.setInverted(BACK_LEFT_DRIVE_INVERTED.getBool());
+                    steerMotor.setInverted(BACK_LEFT_STEER_INVERTED.getBool());
+
                     break;
                 case BACK_RIGHT:
                     driveMotor = new WPI_TalonFX((int) BACK_RIGHT_DRIVE_MOTOR_ID.getInteger());
                     steerMotor = new WPI_TalonFX((int) BACK_RIGHT_STEER_MOTOR_ID.getInteger());
-                    driveMotor.setInverted( BACK_RIGHT_DRIVE_INVERTED.getBool());
-                    steerMotor.setInverted( BACK_RIGHT_STEER_INVERTED.getBool());
+                    driveMotor.setInverted(BACK_RIGHT_DRIVE_INVERTED.getBool());
+                    steerMotor.setInverted(BACK_RIGHT_STEER_INVERTED.getBool());
                     break;
                 default:
                     throw new RuntimeException("Invalid module index for Swerve");
-    
-                
-        }
-    
+
+            }
 
         }
-        
-    if(WHEEL_RADIUS_METERS.hasChanged(hashCode()) || TRACK_WIDTH_METERS.hasChanged(hashCode())) {
-        MODULE_TRANSLATIONS = new Translation2d[] {
-    
-            new Translation2d( -(Double) WHEEL_RADIUS_METERS.getDouble() / 2, (Double) TRACK_WIDTH_METERS.getDouble() / 2),
-            
-            new Translation2d(-(Double) WHEEL_RADIUS_METERS.getDouble() / 2, (Double) TRACK_WIDTH_METERS.getDouble() / 2),
-            
-            new Translation2d(-(Double) WHEEL_RADIUS_METERS.getDouble() / 2, -(Double) TRACK_WIDTH_METERS.getDouble() / 2),
-            
-            new Translation2d(-(Double) WHEEL_RADIUS_METERS.getDouble() / 2, (Double) TRACK_WIDTH_METERS.getDouble() / 2)};
 
-            DRIVE_KINEMATICS =  new SwerveDriveKinematics(MODULE_TRANSLATIONS);
-        
+        if (WHEEL_RADIUS_METERS.hasChanged(hashCode()) || TRACK_WIDTH_METERS.hasChanged(hashCode())) {
+            MODULE_TRANSLATIONS = new Translation2d[] {
+
+                    new Translation2d(-(Double) WHEEL_RADIUS_METERS.getDouble() / 2,
+                            (Double) TRACK_WIDTH_METERS.getDouble() / 2),
+
+                    new Translation2d(-(Double) WHEEL_RADIUS_METERS.getDouble() / 2,
+                            (Double) TRACK_WIDTH_METERS.getDouble() / 2),
+
+                    new Translation2d(-(Double) WHEEL_RADIUS_METERS.getDouble() / 2,
+                            -(Double) TRACK_WIDTH_METERS.getDouble() / 2),
+
+                    new Translation2d(-(Double) WHEEL_RADIUS_METERS.getDouble() / 2,
+                            (Double) TRACK_WIDTH_METERS.getDouble() / 2) };
+
+            DRIVE_KINEMATICS = new SwerveDriveKinematics(MODULE_TRANSLATIONS);
+
+        }
+
+        FRONT_LEFT_DRIVE_MOTOR_ID.periodic();
+        FRONT_LEFT_STEER_MOTOR_ID.periodic();
+        FRONT_RIGHT_DRIVE_MOTOR_ID.periodic();
+        FRONT_RIGHT_STEER_MOTOR_ID.periodic();
+        BACK_LEFT_DRIVE_MOTOR_ID.periodic();
+        BACK_LEFT_STEER_MOTOR_ID.periodic();
+        BACK_RIGHT_DRIVE_MOTOR_ID.periodic();
+        BACK_RIGHT_STEER_MOTOR_ID.periodic();
+        DRIVE_MOTOR_GEAR_RATIO.periodic();
+        STEER_MOTOR_GEAR_RATIO.periodic();
+        FRONT_LEFT_DRIVE_INVERTED.periodic();
+        FRONT_LEFT_STEER_INVERTED.periodic();
+        FRONT_RIGHT_DRIVE_INVERTED.periodic();
+        FRONT_RIGHT_STEER_INVERTED.periodic();
+        BACK_LEFT_DRIVE_INVERTED.periodic();
+        BACK_LEFT_STEER_INVERTED.periodic();
+        BACK_RIGHT_DRIVE_INVERTED.periodic();
+        BACK_RIGHT_STEER_INVERTED.periodic();
+
+        DRIVE_MOTOR_GEAR_RATIO.periodic();
+        STEER_MOTOR_GEAR_RATIO.periodic();
+
+        WHEEL_RADIUS_METERS.periodic();
+        TRACK_WIDTH_METERS.periodic();
+
     }
-
-    FRONT_LEFT_DRIVE_MOTOR_ID.periodic();
-    FRONT_LEFT_STEER_MOTOR_ID.periodic();
-    FRONT_RIGHT_DRIVE_MOTOR_ID.periodic();
-    FRONT_RIGHT_STEER_MOTOR_ID.periodic();
-    BACK_LEFT_DRIVE_MOTOR_ID.periodic();
-    BACK_LEFT_STEER_MOTOR_ID.periodic();
-    BACK_RIGHT_DRIVE_MOTOR_ID.periodic();
-    BACK_RIGHT_STEER_MOTOR_ID.periodic();
-    DRIVE_MOTOR_GEAR_RATIO.periodic();
-    STEER_MOTOR_GEAR_RATIO.periodic();
-    FRONT_LEFT_DRIVE_INVERTED.periodic();
-    FRONT_LEFT_STEER_INVERTED.periodic();
-    FRONT_RIGHT_DRIVE_INVERTED.periodic();
-    FRONT_RIGHT_STEER_INVERTED.periodic();
-    BACK_LEFT_DRIVE_INVERTED.periodic();
-    BACK_LEFT_STEER_INVERTED.periodic();
-    BACK_RIGHT_DRIVE_INVERTED.periodic();
-    BACK_RIGHT_STEER_INVERTED.periodic();
-
-    DRIVE_MOTOR_GEAR_RATIO.periodic();
-    STEER_MOTOR_GEAR_RATIO.periodic();
-
-    WHEEL_RADIUS_METERS.periodic();
-    TRACK_WIDTH_METERS.periodic();
-    
-
-}
 
     public void setDriveVoltage(double volts) {
 
@@ -254,6 +248,5 @@ public class ModuleIOFalcon500 implements ModuleIO{
 
         steerMotor.setNeutralMode(brake ? NeutralMode.Brake : NeutralMode.Coast);
     }
-
 
 }
