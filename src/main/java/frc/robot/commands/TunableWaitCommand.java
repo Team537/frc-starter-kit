@@ -8,7 +8,7 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.utils.LoggedTunableNumber;
+import frc.robot.utils.LoggedTunableValue;
 
 
 /**
@@ -19,14 +19,14 @@ import frc.robot.utils.LoggedTunableNumber;
  */
 public class TunableWaitCommand extends CommandBase {
   protected Timer m_timer = new Timer();
-  private LoggedTunableNumber m_duration;
+  private LoggedTunableValue m_duration;
 
   /**
    * Creates a new WaitCommand. This command will do nothing, and end after the specified duration.
    *
    * @param seconds the time to wait, in seconds
    */
-  public TunableWaitCommand(LoggedTunableNumber seconds) {
+  public TunableWaitCommand(LoggedTunableValue seconds) {
     m_duration = seconds;
     SendableRegistry.setName(this, getName() + ": " + seconds + " seconds");
   }
@@ -46,7 +46,7 @@ public class TunableWaitCommand extends CommandBase {
 
   @Override
   public boolean isFinished() {
-    return m_timer.hasElapsed(m_duration.get());
+    return m_timer.hasElapsed( (double) m_duration.getDouble());
   }
 
   @Override
@@ -57,6 +57,6 @@ public class TunableWaitCommand extends CommandBase {
   @Override
   public void initSendable(SendableBuilder builder) {
     super.initSendable(builder);
-    builder.addDoubleProperty("duration", () -> m_duration.get(), null);
+    builder.addDoubleProperty("duration", () ->(double)  m_duration.getDouble(), null);
   }
 }

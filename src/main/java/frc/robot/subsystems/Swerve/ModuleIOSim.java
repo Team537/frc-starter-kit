@@ -1,5 +1,7 @@
 package frc.robot.subsystems.Swerve;
 
+import org.littletonrobotics.junction.networktables.LoggedDashboardNumber;
+
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.unmanaged.Unmanaged;
 
@@ -7,18 +9,20 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
+import frc.robot.utils.LoggedTunableValue;
+
 
 
 
 public class ModuleIOSim implements ModuleIO {
     
-    public static double kDriveMotorGearRatio = 7.13;
-    public static double kSteerMotorGearRatio = 15.428;
+    public LoggedTunableValue DRIVE_MOTOR_GEAR_RATIO = new LoggedTunableValue("DRIVE_MOTOR_GEAR_RATIO");
+    public LoggedTunableValue STEER_MOTOR_GEAR_RATIO = new LoggedTunableValue("STEER_MOTOR_GEAR_RATIO");
    
-    public static double loopPeriodSecs = 0.02;
-    private static double wheelBase = 0.415;
-    private FlywheelSim driveSim = new FlywheelSim(DCMotor.getFalcon500(1), kDriveMotorGearRatio, 0.02);
-    private FlywheelSim turnSim = new FlywheelSim(DCMotor.getFalcon500(1), kSteerMotorGearRatio,
+    public LoggedTunableValue LOOP_PERIOD_SECONDS = new LoggedTunableValue("LOOP_PERIOD_SECONDS");
+    
+    private FlywheelSim driveSim = new FlywheelSim(DCMotor.getFalcon500(1), DRIVE_MOTOR_GEAR_RATIO.getDouble(), 0.02);
+    private FlywheelSim turnSim = new FlywheelSim(DCMotor.getFalcon500(1), STEER_MOTOR_GEAR_RATIO.getDouble(),
             0.03);
 
         
@@ -30,13 +34,14 @@ public class ModuleIOSim implements ModuleIO {
    
 
     public void updateInputs(ModuleIOInputs inputs) {
+        updateTunableNumbers();
        
-        driveSim.update(loopPeriodSecs);
-        turnSim.update(loopPeriodSecs);
+        driveSim.update(LOOP_PERIOD_SECONDS.getDouble());
+        turnSim.update(LOOP_PERIOD_SECONDS.getDouble());
         
         
         
-        double angleDiffRad = turnSim.getAngularVelocityRadPerSec() * loopPeriodSecs;
+        double angleDiffRad = turnSim.getAngularVelocityRadPerSec() * LOOP_PERIOD_SECONDS.getDouble();
         turnAbsolutePositionRad += angleDiffRad;
         turnPositionRad += angleDiffRad;
 
@@ -51,7 +56,7 @@ public class ModuleIOSim implements ModuleIO {
       
 
         inputs.drivePositionRad = inputs.drivePositionRad
-                + (driveSim.getAngularVelocityRadPerSec() * loopPeriodSecs);
+                + (driveSim.getAngularVelocityRadPerSec() * LOOP_PERIOD_SECONDS.getDouble());
         inputs.driveVelocityRadPerSec = driveSim.getAngularVelocityRadPerSec();
         inputs.driveAppliedVolts = driveVolts;
         inputs.driveCurrentAmps = new double[] { driveSim.getCurrentDrawAmps() };
@@ -73,7 +78,7 @@ public class ModuleIOSim implements ModuleIO {
         
         driveVolts = MathUtil.clamp(volts, -12.0, 12.0);
        
-        driveSim.setInputVoltage(driveVolts );
+        driveSim.setInputVoltage(driveVolts);
 
     }
 
@@ -82,6 +87,12 @@ public class ModuleIOSim implements ModuleIO {
         turnVolts  = MathUtil.clamp(volts, -12.0, 12.0);
         turnSim.setInputVoltage(turnVolts);
 
+    }
+
+    public void updateTunableNumbers() {
+        DRIVE_MOTOR_GEAR_RATIO.periodic();
+        STEER_MOTOR_GEAR_RATIO.periodic();
+        LOOP_PERIOD_SECONDS.periodic();
     }
 
    

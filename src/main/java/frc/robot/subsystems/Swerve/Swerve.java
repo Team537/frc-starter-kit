@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.Gyro.GyroIO;
 import frc.robot.subsystems.Gyro.GyroIOInputsAutoLogged;
+import frc.robot.utils.LoggedTunableValue;
 import frc.robot.utils.ModuleMap;
 import frc.robot.utils.ModulePosition;
 
@@ -34,37 +35,46 @@ public class Swerve extends SubsystemBase {
         private Module backLeftModule;
         private Module backRightModule;
 
-        private double MAX_SPEED_METERS_PER_SECOND  = 2.0;
-        private static double wheelBase = 0.415;
-    public static double trackwidthMeters = 0.415;
+        
+        
+        private LoggedTunableValue MAX_SPEED_METERS_PER_SECOND = new LoggedTunableValue("MAX_SPEED_METERS_PER_SECOND");
+        private LoggedTunableValue MAX_ROTATION_RADIANS_PER_SECOND = new LoggedTunableValue("MAX_ROTATION_RADIANS_PER_SECOND");
+        private LoggedTunableValue WHEEL_RADIUS_METERS = new LoggedTunableValue("WHEEL_RADIUS_METERS");
+        private LoggedTunableValue TRACK_WIDTH_METERS = new LoggedTunableValue("TRACK_WIDTH_METERS");
 
-    private double simYaw = 0;
+
+        private double simYaw = 0;
+
       private HashMap<ModulePosition, Module>   swerveModules = new HashMap<ModulePosition, Module>();
 
       private final GyroIO gyroIO;
       private final GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
 
 
-      public static final Map<ModulePosition, Translation2d> MODULE_TRANSLATIONS = Map.of(
-        ModulePosition.FRONT_LEFT,
-        new Translation2d(-wheelBase / 2,trackwidthMeters / 2),
-        ModulePosition.FRONT_RIGHT,
-        new Translation2d(-wheelBase / 2, -trackwidthMeters / 2),
-        ModulePosition.BACK_LEFT,
-        new Translation2d(wheelBase / 2, -trackwidthMeters / 2),
-        ModulePosition.BACK_RIGHT,
-        new Translation2d(wheelBase / 2, trackwidthMeters/ 2));
+      public  Map<ModulePosition, Translation2d> MODULE_TRANSLATIONS;
 
-        private final SwerveDrivePoseEstimator odometry;
+        private SwerveDrivePoseEstimator odometry;
 
-    public static final SwerveDriveKinematics SWERVE_KINEMATICS = new SwerveDriveKinematics(
-        ModuleMap.orderedValues(MODULE_TRANSLATIONS, new Translation2d[0]));
-    private static final double MAX_ROTATION_RADIANS_PER_SECOND = Math.PI ;
+    public SwerveDriveKinematics SWERVE_KINEMATICS;
+   
 
       public Swerve(GyroIO gyroIO,  ModuleIO flModuleIO,
       ModuleIO frModuleIO,
       ModuleIO blModuleIO,
       ModuleIO brModuleIO) {
+
+        MODULE_TRANSLATIONS = Map.of(
+        ModulePosition.FRONT_LEFT,
+        new Translation2d(-WHEEL_RADIUS_METERS.getDouble()/ 2,TRACK_WIDTH_METERS.getDouble() / 2),
+        ModulePosition.FRONT_RIGHT,
+        new Translation2d(-WHEEL_RADIUS_METERS.getDouble() / 2, -TRACK_WIDTH_METERS.getDouble() / 2),
+        ModulePosition.BACK_LEFT,
+        new Translation2d(WHEEL_RADIUS_METERS.getDouble() / 2, -TRACK_WIDTH_METERS.getDouble() / 2),
+        ModulePosition.BACK_RIGHT,
+        new Translation2d(WHEEL_RADIUS_METERS.getDouble() / 2, TRACK_WIDTH_METERS.getDouble()/ 2));
+
+        SWERVE_KINEMATICS = new SwerveDriveKinematics(
+        ModuleMap.orderedValues(MODULE_TRANSLATIONS, new Translation2d[0]));
 
         this.gyroIO = gyroIO;
 
@@ -89,7 +99,7 @@ public class Swerve extends SubsystemBase {
 
       public void setSwerveModuleStatesMap(Map<ModulePosition, SwerveModuleState> moduleStates) {
         SwerveDriveKinematics.desaturateWheelSpeeds(
-            ModuleMap.orderedValues(moduleStates, new SwerveModuleState[0]), MAX_SPEED_METERS_PER_SECOND);
+            ModuleMap.orderedValues(moduleStates, new SwerveModuleState[0]), MAX_SPEED_METERS_PER_SECOND.getDouble());
         
         for (Module module : ModuleMap.orderedValuesList(swerveModules))
           module.setDesiredState(moduleStates.get(module.getModulePosition()));
@@ -101,9 +111,9 @@ public class Swerve extends SubsystemBase {
         double strafe,
         double rotation,
         boolean isFieldRelative) {
-      drive *= MAX_SPEED_METERS_PER_SECOND;
-      strafe *= MAX_SPEED_METERS_PER_SECOND;
-      rotation *= MAX_ROTATION_RADIANS_PER_SECOND;
+      drive *= MAX_SPEED_METERS_PER_SECOND.getDouble();
+      strafe *= MAX_SPEED_METERS_PER_SECOND.getDouble();
+      rotation *= MAX_ROTATION_RADIANS_PER_SECOND.getDouble();
   
       // Chassis Speed
       ChassisSpeeds chassisSpeeds = isFieldRelative ? ChassisSpeeds.fromFieldRelativeSpeeds(
@@ -115,7 +125,6 @@ public class Swerve extends SubsystemBase {
       Map<ModulePosition, SwerveModuleState> moduleStates = ModuleMap
           .of(SWERVE_KINEMATICS.toSwerveModuleStates(chassisSpeeds));
   
-        Logger.getInstance().recordOutput("Module States", moduleStates.toString());
 
       setSwerveModuleStatesMap(moduleStates);
   
@@ -171,8 +180,39 @@ public class Swerve extends SubsystemBase {
         return map;
       }
 
+      public void updateTunableNumbers(){
+
+        if(TRACK_WIDTH_METERS.hasChanged(hashCode()) || WHEEL_RADIUS_METERS.hasChanged(hashCode())){
+          MODULE_TRANSLATIONS = Map.of(
+        ModulePosition.FRONT_LEFT,
+        new Translation2d(-WHEEL_RADIUS_METERS.getDouble() / 2,TRACK_WIDTH_METERS.getDouble() / 2),
+        ModulePosition.FRONT_RIGHT,
+        new Translation2d(-WHEEL_RADIUS_METERS.getDouble() / 2, -TRACK_WIDTH_METERS.getDouble() / 2),
+        ModulePosition.BACK_LEFT,
+        new Translation2d(WHEEL_RADIUS_METERS.getDouble() / 2, -TRACK_WIDTH_METERS.getDouble() / 2),
+        ModulePosition.BACK_RIGHT,
+        new Translation2d(WHEEL_RADIUS_METERS.getDouble() / 2, TRACK_WIDTH_METERS.getDouble()/ 2));
+
+        SWERVE_KINEMATICS = new SwerveDriveKinematics(
+        ModuleMap.orderedValues(MODULE_TRANSLATIONS, new Translation2d[0]));
+
+        // odometry = new SwerveDrivePoseEstimator(
+        //   SWERVE_KINEMATICS,
+        //   getHeadingRotation2d(),
+        //   getModulePositions(),
+        //   new Pose2d());
+        }
+
+
+        MAX_SPEED_METERS_PER_SECOND.periodic();
+        MAX_ROTATION_RADIANS_PER_SECOND.periodic();
+        TRACK_WIDTH_METERS.periodic();
+        WHEEL_RADIUS_METERS.periodic();
+      }
+
       @Override 
       public void periodic() {
+        updateTunableNumbers();
         ChassisSpeeds chassisSpeed = SWERVE_KINEMATICS.toChassisSpeeds(
           ModuleMap.orderedValues(getModuleStates(), new SwerveModuleState[0]));
         updateOdometry();
@@ -189,6 +229,7 @@ public class Swerve extends SubsystemBase {
         gyroIO.updateInputs(gyroInputs);
        
         Logger.getInstance().recordOutput("Swerve Pose", getPoseMeters());
+        Logger.getInstance().recordOutput("ModuleStates", ModuleMap.orderedValues(getModuleStates(), new SwerveModuleState[0]));
         Logger.getInstance().processInputs("Gyro", gyroInputs);
         
       }

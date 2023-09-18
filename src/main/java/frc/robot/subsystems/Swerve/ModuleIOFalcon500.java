@@ -9,138 +9,250 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 
 
 import frc.robot.utils.CtreUtils;
+import frc.robot.utils.LoggedTunableValue;
 import frc.robot.utils.ModulePosition;
 
 public class ModuleIOFalcon500 implements ModuleIO{
-    private final WPI_TalonFX m_drive;
-    private final WPI_TalonFX m_turn;
+    private WPI_TalonFX driveMotor;
+    private WPI_TalonFX steerMotor;
+    private final ModulePosition position;
 
   
 
-    public static int kFrontLeftDrive = 0;
-    public static int kFrontLeftTurn = 1;
-    public static int kFrontRightDrive = 2;
-    public static int kFrontRightTurn = 3;
-    public static int kBackLeftDrive = 4;
-    public static int kBackLeftTurn = 5;
-    public static int kBackRightDrive = 6;
-    public static int kBackRightTurn = 7;
-    public static double kDriveMotorGearRatio = 7.13;
-    public static double kSteerMotorGearRatio = 15.428;
-    public static double kMaxSpeed = 10;
-    public static double trackwidthMeters = 0.415;
-   
-    private static double wheelBase = 0.415;
+    public LoggedTunableValue FRONT_LEFT_DRIVE_MOTOR_ID = new LoggedTunableValue("FRONT_LEFT_DRIVE_MOTOR_ID");
+    public LoggedTunableValue FRONT_LEFT_STEER_MOTOR_ID = new LoggedTunableValue("FRONT_LEFT_STEER_MOTOR_ID");
+    public LoggedTunableValue FRONT_RIGHT_DRIVE_MOTOR_ID = new LoggedTunableValue("FRONT_RIGHT_DRIVE_MOTOR_ID");
+    public LoggedTunableValue FRONT_RIGHT_STEER_MOTOR_ID = new LoggedTunableValue("FRONT_RIGHT_STEER_MOTOR_ID");
+    public LoggedTunableValue BACK_LEFT_DRIVE_MOTOR_ID = new LoggedTunableValue("BACK_LEFT_DRIVE_MOTOR_ID");
+    public LoggedTunableValue BACK_LEFT_STEER_MOTOR_ID = new LoggedTunableValue("BACK_LEFT_STEER_MOTOR_ID");
+    public LoggedTunableValue BACK_RIGHT_DRIVE_MOTOR_ID = new LoggedTunableValue("BACK_RIGHT_DRIVE_MOTOR_ID");
+    public LoggedTunableValue BACK_RIGHT_STEER_MOTOR_ID = new LoggedTunableValue("BACK_RIGHT_STEER_MOTOR_ID");
 
-    public static final Translation2d[] moduleTranslations = new Translation2d[] {
+    public LoggedTunableValue FRONT_LEFT_DRIVE_INVERTED = new LoggedTunableValue("FRONT_LEFT_DRIVE_INVERTED");
+    public LoggedTunableValue FRONT_LEFT_STEER_INVERTED = new LoggedTunableValue("FRONT_LEFT_STEER_INVERTED");
+    public LoggedTunableValue FRONT_RIGHT_DRIVE_INVERTED = new LoggedTunableValue("FRONT_RIGHT_DRIVE_INVERTED");
+    public LoggedTunableValue FRONT_RIGHT_STEER_INVERTED = new LoggedTunableValue("FRONT_RIGHT_STEER_INVERTED");
+    public LoggedTunableValue BACK_LEFT_DRIVE_INVERTED = new LoggedTunableValue("BACK_LEFT_DRIVE_INVERTED");
+    public LoggedTunableValue BACK_LEFT_STEER_INVERTED = new LoggedTunableValue("BACK_LEFT_STEER_INVERTED"); 
+    public LoggedTunableValue BACK_RIGHT_DRIVE_INVERTED = new LoggedTunableValue("BACK_RIGHT_DRIVE_INVERTED");
+    public LoggedTunableValue BACK_RIGHT_STEER_INVERTED = new LoggedTunableValue("BACK_RIGHT_STEER_INVERTED");
+
+    public LoggedTunableValue DRIVE_MOTOR_GEAR_RATIO = new LoggedTunableValue("DRIVE_MOTOR_GEAR_RATIO");
+    public LoggedTunableValue STEER_MOTOR_GEAR_RATIO = new LoggedTunableValue("STEER_MOTOR_GEAR_RATIO");
+
     
-    new Translation2d(-wheelBase / 2, trackwidthMeters / 2),
+    private LoggedTunableValue TRACK_WIDTH_METERS = new LoggedTunableValue("TRACK_WIDTH_METERS");
+    private LoggedTunableValue WHEEL_RADIUS_METERS = new LoggedTunableValue("WHEEL_RADIUS_METERS");
+
+    public static Translation2d[] MODULE_TRANSLATIONS;
     
-    new Translation2d(-wheelBase / 2, trackwidthMeters / 2),
-    
-    new Translation2d(wheelBase / 2, -trackwidthMeters / 2),
-    
-    new Translation2d(wheelBase / 2, trackwidthMeters / 2)};
-    public static final double FEED_FORWARD_STATIC_GAIN = 0;
-    public static final double FEED_FORWARD_VELOCITY_GAIN = 0;
-    public static final double FEED_FORWARD_ACCELERATION_GAIN = 0;
-    public static final double TURN_ENCODER_METERS_PER_PULSE = 0;
 
-    public static SwerveDriveKinematics kDriveKinematics =  new SwerveDriveKinematics(moduleTranslations);
-
-    public static double loopPeriodSecs = 0.02;
-   
-
-
-
-
-
+    public static SwerveDriveKinematics DRIVE_KINEMATICS;
 
     public ModuleIOFalcon500(ModulePosition modulePosition) {
+        this.position = modulePosition;
+        MODULE_TRANSLATIONS = new Translation2d[] {
+    
+            new Translation2d( -WHEEL_RADIUS_METERS.getDouble() / 2,  TRACK_WIDTH_METERS.getDouble() / 2),
+            
+            new Translation2d(-WHEEL_RADIUS_METERS.getDouble() / 2,  TRACK_WIDTH_METERS.getDouble() / 2),
+            
+            new Translation2d(-WHEEL_RADIUS_METERS.getDouble() / 2, -TRACK_WIDTH_METERS.getDouble() / 2),
+            
+            new Translation2d(-WHEEL_RADIUS_METERS.getDouble() / 2, TRACK_WIDTH_METERS.getDouble() / 2)};
 
-        switch (modulePosition) {
+            DRIVE_KINEMATICS =  new SwerveDriveKinematics(MODULE_TRANSLATIONS);
+
+       
+        switch (position) {
 
             case FRONT_LEFT:
-                m_drive = new WPI_TalonFX(kFrontLeftDrive);
-                m_turn = new WPI_TalonFX(kFrontLeftTurn);
-                m_drive.setInverted(false);
+                driveMotor = new WPI_TalonFX( (int) FRONT_LEFT_DRIVE_MOTOR_ID.getInteger());
+                steerMotor = new WPI_TalonFX( (int) FRONT_LEFT_STEER_MOTOR_ID.getInteger());
+                driveMotor.setInverted((Boolean) FRONT_LEFT_DRIVE_INVERTED.getBool());
+                steerMotor.setInverted((Boolean) FRONT_LEFT_STEER_INVERTED.getBool());
                 break;
 
             case FRONT_RIGHT:
-                m_drive = new WPI_TalonFX(kFrontRightDrive);
-                m_turn = new WPI_TalonFX(kFrontRightTurn);
-                m_drive.setInverted(true);
+                driveMotor = new WPI_TalonFX((int) FRONT_RIGHT_DRIVE_MOTOR_ID.getInteger());
+                steerMotor = new WPI_TalonFX((int) FRONT_RIGHT_STEER_MOTOR_ID.getInteger());
+                driveMotor.setInverted((Boolean) FRONT_RIGHT_DRIVE_INVERTED.getBool());
+                steerMotor.setInverted((Boolean) FRONT_RIGHT_STEER_INVERTED.getBool());
                 break;
             case BACK_LEFT:
-                m_drive = new WPI_TalonFX(kBackLeftDrive);
-                m_turn = new WPI_TalonFX(kBackLeftTurn);
-                m_drive.setInverted(true);
+                driveMotor = new WPI_TalonFX((int) BACK_LEFT_DRIVE_MOTOR_ID.getInteger());
+                steerMotor = new WPI_TalonFX((int) BACK_LEFT_STEER_MOTOR_ID.getInteger());
+                driveMotor.setInverted((Boolean) BACK_LEFT_DRIVE_INVERTED.getBool());
+                steerMotor.setInverted((Boolean) BACK_LEFT_STEER_INVERTED.getBool());
+
                 break;
             case BACK_RIGHT:
-                m_drive = new WPI_TalonFX(kBackRightDrive);
-                m_turn = new WPI_TalonFX(kBackRightTurn);
-                m_drive.setInverted(false);
+                driveMotor = new WPI_TalonFX((int) BACK_RIGHT_DRIVE_MOTOR_ID.getInteger());
+                steerMotor = new WPI_TalonFX((int) BACK_RIGHT_STEER_MOTOR_ID.getInteger());
+                driveMotor.setInverted((Boolean) BACK_RIGHT_DRIVE_INVERTED.getBool());
+                steerMotor.setInverted((Boolean) BACK_RIGHT_STEER_INVERTED.getBool());
                 break;
             default:
                 throw new RuntimeException("Invalid module index for Swerve");
 
         }
-        m_drive.configFactoryDefault();
-        m_drive.configAllSettings(CtreUtils.generateDriveMotorConfig());
-        m_drive.setSensorPhase(true);
-        m_drive.setSafetyEnabled(true);
-        m_drive.enableVoltageCompensation(true);
+        driveMotor.configFactoryDefault();
+        driveMotor.configAllSettings(CtreUtils.generateDriveMotorConfig());
+        driveMotor.setSensorPhase(true);
+        driveMotor.setSafetyEnabled(true);
+        driveMotor.enableVoltageCompensation(true);
 
-        m_turn.configFactoryDefault();
-        m_turn.configAllSettings(CtreUtils.generateTurnMotorConfig());
+        steerMotor.configFactoryDefault();
+        steerMotor.configAllSettings(CtreUtils.generateTurnMotorConfig());
 
     }
 
     public void updateInputs(ModuleIOInputs inputs) {
-        inputs.drivePositionRad = m_drive.getSelectedSensorPosition() * Math.PI * 2
-                * kDriveMotorGearRatio / 2048;
+        updateTunableNumbers();
+
+        inputs.drivePositionRad = driveMotor.getSelectedSensorPosition() * Math.PI * 2
+                * (double) DRIVE_MOTOR_GEAR_RATIO.getDouble() / 2048;
 
         // Multiply 10 because Selected Sensor Velocity is measured per 100 ms
-        inputs.driveVelocityRadPerSec = m_drive.getSelectedSensorVelocity() * 10 * Math.PI * 2
-                * kDriveMotorGearRatio / 2048;
+        inputs.driveVelocityRadPerSec = driveMotor.getSelectedSensorVelocity() * 10 * Math.PI * 2
+                * (double) DRIVE_MOTOR_GEAR_RATIO.getDouble() / 2048;
 
-        inputs.driveAppliedVolts = m_drive.getMotorOutputVoltage() * m_drive.getBusVoltage();
-        inputs.driveCurrentAmps = new double[] { m_drive.getSupplyCurrent() };
-        inputs.driveTemperatureCelcius = new double[] { m_drive.getTemperature() };
+        inputs.driveAppliedVolts = driveMotor.getMotorOutputVoltage() * driveMotor.getBusVoltage();
+        inputs.driveCurrentAmps = new double[] { driveMotor.getSupplyCurrent() };
+        inputs.driveTemperatureCelcius = new double[] { driveMotor.getTemperature() };
 
         inputs.steerAbsolutePositionRad = 0; // Temporary, wait until Mag Encoder Implementation
-        inputs.steerPositionRad = m_turn.getSelectedSensorPosition() * 2 * Math.PI
-                / (2048 * kSteerMotorGearRatio);
+        inputs.steerPositionRad = steerMotor.getSelectedSensorPosition() * 2 * Math.PI
+                / (2048 * (double) STEER_MOTOR_GEAR_RATIO.getDouble());
 
         // Multiply 10 because Selected Sensor Velocity is measured per 100 ms
-        inputs.steerVelocityRadPerSec = m_turn.getSelectedSensorVelocity() * 10 * 2 * Math.PI
-                / (2048 * kSteerMotorGearRatio);
+        inputs.steerVelocityRadPerSec = steerMotor.getSelectedSensorVelocity() * 10 * 2 * Math.PI
+                / (2048 *(double) STEER_MOTOR_GEAR_RATIO.getDouble());
 
-        inputs.steerAppliedVolts = m_turn.getMotorOutputVoltage() * m_turn.getBusVoltage();
-        inputs.steerCurrentAmps = new double[] { m_turn.getSupplyCurrent() };
-        inputs.steerTemperatureCelcius = new double[] { m_turn.getTemperature() };
+        inputs.steerAppliedVolts = steerMotor.getMotorOutputVoltage() * steerMotor.getBusVoltage();
+        inputs.steerCurrentAmps = new double[] { steerMotor.getSupplyCurrent() };
+        inputs.steerTemperatureCelcius = new double[] { steerMotor.getTemperature() };
     }
+
+    public void updateTunableNumbers() {
+
+        if(
+            FRONT_LEFT_DRIVE_MOTOR_ID.hasChanged(hashCode()) || 
+        FRONT_LEFT_DRIVE_INVERTED.hasChanged(hashCode()) || 
+        FRONT_LEFT_STEER_MOTOR_ID.hasChanged(hashCode()) || 
+        FRONT_LEFT_STEER_INVERTED.hasChanged(hashCode()) || 
+        FRONT_RIGHT_DRIVE_MOTOR_ID.hasChanged(hashCode()) || 
+        FRONT_RIGHT_DRIVE_INVERTED.hasChanged(hashCode()) || 
+        FRONT_RIGHT_STEER_MOTOR_ID.hasChanged(hashCode()) || 
+        FRONT_RIGHT_STEER_INVERTED.hasChanged(hashCode()) || 
+        BACK_LEFT_DRIVE_MOTOR_ID.hasChanged(hashCode()) || 
+        BACK_LEFT_DRIVE_INVERTED.hasChanged(hashCode()) || 
+        BACK_LEFT_STEER_MOTOR_ID.hasChanged(hashCode()) || 
+        BACK_LEFT_STEER_INVERTED.hasChanged(hashCode()) || 
+        BACK_RIGHT_DRIVE_MOTOR_ID.hasChanged(hashCode()) || 
+        BACK_RIGHT_DRIVE_INVERTED.hasChanged(hashCode()) || 
+        BACK_RIGHT_STEER_MOTOR_ID.hasChanged(hashCode()) || 
+        BACK_RIGHT_STEER_INVERTED.hasChanged(hashCode())) {
+            switch (position) {
+
+                case FRONT_LEFT:
+                    driveMotor = new WPI_TalonFX( (int) FRONT_LEFT_DRIVE_MOTOR_ID.getInteger());
+                    steerMotor = new WPI_TalonFX( (int) FRONT_LEFT_STEER_MOTOR_ID.getInteger());
+                    driveMotor.setInverted( FRONT_LEFT_DRIVE_INVERTED.getBool());
+                    steerMotor.setInverted( FRONT_LEFT_STEER_INVERTED.getBool());
+                    break;
+    
+                case FRONT_RIGHT:
+                    driveMotor = new WPI_TalonFX((int) FRONT_RIGHT_DRIVE_MOTOR_ID.getInteger());
+                    steerMotor = new WPI_TalonFX((int) FRONT_RIGHT_STEER_MOTOR_ID.getInteger());
+                    driveMotor.setInverted( FRONT_RIGHT_DRIVE_INVERTED.getBool());
+                    steerMotor.setInverted( FRONT_RIGHT_STEER_INVERTED.getBool());
+                    break;
+                case BACK_LEFT:
+                    driveMotor = new WPI_TalonFX((int) BACK_LEFT_DRIVE_MOTOR_ID.getInteger());
+                    steerMotor = new WPI_TalonFX((int) BACK_LEFT_STEER_MOTOR_ID.getInteger());
+                    driveMotor.setInverted( BACK_LEFT_DRIVE_INVERTED.getBool());
+                    steerMotor.setInverted( BACK_LEFT_STEER_INVERTED.getBool());
+    
+                    break;
+                case BACK_RIGHT:
+                    driveMotor = new WPI_TalonFX((int) BACK_RIGHT_DRIVE_MOTOR_ID.getInteger());
+                    steerMotor = new WPI_TalonFX((int) BACK_RIGHT_STEER_MOTOR_ID.getInteger());
+                    driveMotor.setInverted( BACK_RIGHT_DRIVE_INVERTED.getBool());
+                    steerMotor.setInverted( BACK_RIGHT_STEER_INVERTED.getBool());
+                    break;
+                default:
+                    throw new RuntimeException("Invalid module index for Swerve");
+    
+                
+        }
+    
+
+        }
+        
+    if(WHEEL_RADIUS_METERS.hasChanged(hashCode()) || TRACK_WIDTH_METERS.hasChanged(hashCode())) {
+        MODULE_TRANSLATIONS = new Translation2d[] {
+    
+            new Translation2d( -(Double) WHEEL_RADIUS_METERS.getDouble() / 2, (Double) TRACK_WIDTH_METERS.getDouble() / 2),
+            
+            new Translation2d(-(Double) WHEEL_RADIUS_METERS.getDouble() / 2, (Double) TRACK_WIDTH_METERS.getDouble() / 2),
+            
+            new Translation2d(-(Double) WHEEL_RADIUS_METERS.getDouble() / 2, -(Double) TRACK_WIDTH_METERS.getDouble() / 2),
+            
+            new Translation2d(-(Double) WHEEL_RADIUS_METERS.getDouble() / 2, (Double) TRACK_WIDTH_METERS.getDouble() / 2)};
+
+            DRIVE_KINEMATICS =  new SwerveDriveKinematics(MODULE_TRANSLATIONS);
+        
+    }
+
+    FRONT_LEFT_DRIVE_MOTOR_ID.periodic();
+    FRONT_LEFT_STEER_MOTOR_ID.periodic();
+    FRONT_RIGHT_DRIVE_MOTOR_ID.periodic();
+    FRONT_RIGHT_STEER_MOTOR_ID.periodic();
+    BACK_LEFT_DRIVE_MOTOR_ID.periodic();
+    BACK_LEFT_STEER_MOTOR_ID.periodic();
+    BACK_RIGHT_DRIVE_MOTOR_ID.periodic();
+    BACK_RIGHT_STEER_MOTOR_ID.periodic();
+    DRIVE_MOTOR_GEAR_RATIO.periodic();
+    STEER_MOTOR_GEAR_RATIO.periodic();
+    FRONT_LEFT_DRIVE_INVERTED.periodic();
+    FRONT_LEFT_STEER_INVERTED.periodic();
+    FRONT_RIGHT_DRIVE_INVERTED.periodic();
+    FRONT_RIGHT_STEER_INVERTED.periodic();
+    BACK_LEFT_DRIVE_INVERTED.periodic();
+    BACK_LEFT_STEER_INVERTED.periodic();
+    BACK_RIGHT_DRIVE_INVERTED.periodic();
+    BACK_RIGHT_STEER_INVERTED.periodic();
+
+    DRIVE_MOTOR_GEAR_RATIO.periodic();
+    STEER_MOTOR_GEAR_RATIO.periodic();
+
+    WHEEL_RADIUS_METERS.periodic();
+    TRACK_WIDTH_METERS.periodic();
+    
+
+}
 
     public void setDriveVoltage(double volts) {
 
-        m_drive.set(ControlMode.PercentOutput, volts / 12);
+        driveMotor.set(ControlMode.PercentOutput, volts / 12);
 
     }
 
     public void setSteerVoltage(double volts) {
 
-        m_turn.set(ControlMode.PercentOutput, volts / 12);
+        steerMotor.set(ControlMode.PercentOutput, volts / 12);
 
     }
 
     public void setDriveBrakeMode(boolean brake) {
 
-        m_drive.setNeutralMode(brake ? NeutralMode.Brake : NeutralMode.Coast);
+        driveMotor.setNeutralMode(brake ? NeutralMode.Brake : NeutralMode.Coast);
     }
 
     public void setSteerBrakeMode(boolean brake) {
 
-        m_turn.setNeutralMode(brake ? NeutralMode.Brake : NeutralMode.Coast);
+        steerMotor.setNeutralMode(brake ? NeutralMode.Brake : NeutralMode.Coast);
     }
 
 
