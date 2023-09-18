@@ -30,7 +30,7 @@ public class LoggedTunableValue {
   private LoggedDashboardString dashboardString;
   private LoggedDashboardBoolean dashboardBoolean;
   private Map<Integer, Object> lastHasChangedValues = new HashMap<>();
-  private boolean tuningMode = (boolean) yamlDataHolder.getProperty("TuningMode");
+  private boolean TUNING_MODE = (boolean) yamlDataHolder.getProperty("TUNING_MODE");
 
   /**
    * Create a new LoggedTunableNumber
@@ -82,7 +82,7 @@ public class LoggedTunableValue {
     if (!hasDefault) {
       return 0.0;
     } else {
-      return tuningMode ? dashboardNumber.get() : (Double) defaultValue;
+      return TUNING_MODE ? dashboardNumber.get() : (Double) defaultValue;
     }
   }
 
@@ -91,7 +91,7 @@ public class LoggedTunableValue {
     if (!hasDefault) {
       return 0;
     } else {
-      return tuningMode ? (int) dashboardNumber.get() : (int) defaultValue;
+      return TUNING_MODE ? (int) dashboardNumber.get() : (int) defaultValue;
     }
   }
 
@@ -100,7 +100,7 @@ public class LoggedTunableValue {
     if (!hasDefault) {
       return "";
     } else {
-      return tuningMode ? dashboardString.get() : defaultValue.toString();
+      return TUNING_MODE ? dashboardString.get() : defaultValue.toString();
     }
   }
 
@@ -109,7 +109,7 @@ public class LoggedTunableValue {
     if (!hasDefault) {
       return false;
     } else {
-      return tuningMode ? dashboardBoolean.get() : (Boolean) defaultValue;
+      return TUNING_MODE ? dashboardBoolean.get() : (Boolean) defaultValue;
     }
   }
 
