@@ -68,9 +68,13 @@ public class Module extends SubsystemBase {
   }
 
   public void updateInputs() {
+    updateTunableNumbers();
     io.updateInputs(inputs);
     Logger.getInstance().processInputs("Module " + position, inputs);
 
+  }
+
+  public void updateTunableNumbers() {
     if (ENCODER_RESOLUTION.hasChanged(hashCode()) || STEER_MOTOR_GEAR_RATIO.hasChanged(hashCode())) {
 
       STEER_ENCODER_METERS_PER_PULSE
@@ -108,7 +112,6 @@ public class Module extends SubsystemBase {
     STEER_P.periodic();
     STEER_I.periodic();
     STEER_D.periodic();
-
   }
 
   public void setDesiredState(SwerveModuleState state) {
