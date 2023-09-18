@@ -12,10 +12,11 @@ import frc.robot.subsystems.Swerve.ModuleIOFalcon500;
 import frc.robot.subsystems.Swerve.ModuleIOSim;
 import frc.robot.subsystems.Swerve.Swerve;
 import frc.robot.utils.ModulePosition;
+import frc.robot.utils.RobotMode;
 
 public class RobotContainer {
     private Swerve swerve;
-    private Mode mode = Mode.SIM;
+    public static RobotMode mode = RobotMode.REPLAY;
     private XboxController controller = new XboxController(0);
     private YAMLDataHolder yamlDataHolder;
 
@@ -73,9 +74,4 @@ public class RobotContainer {
 
     }
 
-    public enum Mode {
-        REAL,
-        SIM,
-        REPLAY
-    }
 }

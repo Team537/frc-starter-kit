@@ -14,6 +14,7 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.utils.RobotMode;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -53,13 +54,13 @@ public class Robot extends LoggedRobot {
     }
 
     // Set up data receivers & replay source
-    if (isReal()) {
+    if (RobotContainer.mode == RobotMode.REAL) {
       logger.addDataReceiver(new WPILOGWriter("/media/sda1/")); // Log to a USB stick
       logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
-    } else if (isSimulation()) {
-      logger.addDataReceiver(new WPILOGWriter("./"));
+    } else if (RobotContainer.mode == RobotMode.SIM) {
+      logger.addDataReceiver(new WPILOGWriter("./Logs"));
       logger.addDataReceiver(new NT4Publisher());
-    } else {
+    } else if (RobotContainer.mode == RobotMode.REPLAY) {
       setUseTiming(false); // Run as fast as possible
       String logPath = LogFileUtil.findReplayLog(); // Pull the replay log from AdvantageScope (or prompt the user)
       logger.setReplaySource(new WPILOGReader(logPath)); // Read replay log
