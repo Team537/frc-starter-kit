@@ -29,21 +29,31 @@ public class Module extends SubsystemBase {
 
   // 360 / (ENCODER_RESOLUTION * TURNING_MOTOR_GEAR_RATIO);
 
-  private LoggedTunableValue STEER_MOTOR_GEAR_RATIO = new LoggedTunableValue("STEER_MOTOR_GEAR_RATIO");
-  private LoggedTunableValue STEER_ENCODER_METERS_PER_PULSE = new LoggedTunableValue("STEER_ENCODER_METERS_PER_PULSE");
-  private LoggedTunableValue ENCODER_RESOLUTION = new LoggedTunableValue("ENCODER_RESOLUTION");
-  private LoggedTunableValue DRIVE_FEEDFORWARD_KS = new LoggedTunableValue("DRIVE_FEEDFORWARD_KS");
-  private LoggedTunableValue DRIVE_FEEDFORWARD_KV = new LoggedTunableValue("DRIVE_FEEDFORWARD_KV");
-  private LoggedTunableValue STEER_FEEDFORWARD_KS = new LoggedTunableValue("STEER_FEEDFORWARD_KS");
-  private LoggedTunableValue STEER_FEEDFORWARD_KV = new LoggedTunableValue("STEER_FEEDFORWARD_KV");
-  private LoggedTunableValue LOOP_PERIOD_SECONDS = new LoggedTunableValue("LOOP_PERIOD_SECONDS");
-  private LoggedTunableValue WHEEL_RADIUS_METERS = new LoggedTunableValue("WHEEL_RADIUS_METERS");
-  private LoggedTunableValue DRIVE_P = new LoggedTunableValue("DRIVE_P");
-  private LoggedTunableValue DRIVE_I = new LoggedTunableValue("DRIVE_I");
-  private LoggedTunableValue DRIVE_D = new LoggedTunableValue("DRIVE_D");
-  private LoggedTunableValue STEER_P = new LoggedTunableValue("STEER_P");
-  private LoggedTunableValue STEER_I = new LoggedTunableValue("STEER_I");
-  private LoggedTunableValue STEER_D = new LoggedTunableValue("STEER_D");
+  private LoggedTunableValue STEER_MOTOR_GEAR_RATIO = new LoggedTunableValue("Swerve/STEER_MOTOR_GEAR_RATIO",
+      "STEER_MOTOR_GEAR_RATIO");
+  private LoggedTunableValue STEER_ENCODER_METERS_PER_PULSE = new LoggedTunableValue(
+      "Swerve/STEER_ENCODER_METERS_PER_PULSE",
+      "STEER_ENCODER_METERS_PER_PULSE");
+  private LoggedTunableValue ENCODER_RESOLUTION = new LoggedTunableValue("Swerve/ENCODER_RESOLUTION",
+      "ENCODER_RESOLUTION");
+  private LoggedTunableValue DRIVE_FEEDFORWARD_KS = new LoggedTunableValue("Swerve/DRIVE_FEEDFORWARD_KS",
+      "DRIVE_FEEDFORWARD_KS");
+  private LoggedTunableValue DRIVE_FEEDFORWARD_KV = new LoggedTunableValue("Swerve/DRIVE_FEEDFORWARD_KV",
+      "DRIVE_FEEDFORWARD_KV");
+  private LoggedTunableValue STEER_FEEDFORWARD_KS = new LoggedTunableValue("Swerve/STEER_FEEDFORWARD_KS",
+      "STEER_FEEDFORWARD_KS");
+  private LoggedTunableValue STEER_FEEDFORWARD_KV = new LoggedTunableValue("Swerve/STEER_FEEDFORWARD_KV",
+      "STEER_FEEDFORWARD_KV");
+  private LoggedTunableValue LOOP_PERIOD_SECONDS = new LoggedTunableValue("Swerve/LOOP_PERIOD_SECONDS",
+      "LOOP_PERIOD_SECONDS");
+  private LoggedTunableValue WHEEL_RADIUS_METERS = new LoggedTunableValue("Swerve/WHEEL_RADIUS_METERS",
+      "WHEEL_RADIUS_METERS");
+  private LoggedTunableValue DRIVE_P = new LoggedTunableValue("Swerve/DRIVE_P", "DRIVE_P");
+  private LoggedTunableValue DRIVE_I = new LoggedTunableValue("Swerve/DRIVE_I", "DRIVE_I");
+  private LoggedTunableValue DRIVE_D = new LoggedTunableValue("Swerve/DRIVE_D", "DRIVE_D");
+  private LoggedTunableValue STEER_P = new LoggedTunableValue("Swerve/STEER_P", "STEER_P");
+  private LoggedTunableValue STEER_I = new LoggedTunableValue("Swerve/STEER_I", "STEER_I");
+  private LoggedTunableValue STEER_D = new LoggedTunableValue("Swerve/STEER_D", "STEER_D");
 
   private SimpleMotorFeedforward driveFeedforward;
   private SimpleMotorFeedforward steerFeedforward;
@@ -55,7 +65,7 @@ public class Module extends SubsystemBase {
     this.io = io;
     this.position = position;
     STEER_ENCODER_METERS_PER_PULSE
-        .set(360 / ((double) ENCODER_RESOLUTION.getDouble() * (double) STEER_MOTOR_GEAR_RATIO.getDouble()));
+        .setDouble(360 / ((double) ENCODER_RESOLUTION.getDouble() * (double) STEER_MOTOR_GEAR_RATIO.getDouble()));
     driveFeedforward = new SimpleMotorFeedforward((double) DRIVE_FEEDFORWARD_KS.getDouble(),
         (double) DRIVE_FEEDFORWARD_KV.getDouble());
     steerFeedforward = new SimpleMotorFeedforward((double) STEER_FEEDFORWARD_KS.getDouble(),
@@ -78,7 +88,7 @@ public class Module extends SubsystemBase {
     if (ENCODER_RESOLUTION.hasChanged(hashCode()) || STEER_MOTOR_GEAR_RATIO.hasChanged(hashCode())) {
 
       STEER_ENCODER_METERS_PER_PULSE
-          .set(360 / ((double) ENCODER_RESOLUTION.getDouble() * (double) STEER_MOTOR_GEAR_RATIO.getDouble()));
+          .setDouble(360 / ((double) ENCODER_RESOLUTION.getDouble() * (double) STEER_MOTOR_GEAR_RATIO.getDouble()));
     }
     if (DRIVE_FEEDFORWARD_KS.hasChanged(hashCode()) || DRIVE_FEEDFORWARD_KV.hasChanged(hashCode())) {
       driveFeedforward = new SimpleMotorFeedforward((double) DRIVE_FEEDFORWARD_KS.getDouble(),

@@ -13,10 +13,13 @@ import frc.robot.utils.LoggedTunableValue;
 
 public class ModuleIOSim implements ModuleIO {
 
-    public LoggedTunableValue DRIVE_MOTOR_GEAR_RATIO = new LoggedTunableValue("DRIVE_MOTOR_GEAR_RATIO");
-    public LoggedTunableValue STEER_MOTOR_GEAR_RATIO = new LoggedTunableValue("STEER_MOTOR_GEAR_RATIO");
+    public LoggedTunableValue DRIVE_MOTOR_GEAR_RATIO = new LoggedTunableValue("Swerve/DRIVE_MOTOR_GEAR_RATIO",
+            "DRIVE_MOTOR_GEAR_RATIO");
+    public LoggedTunableValue STEER_MOTOR_GEAR_RATIO = new LoggedTunableValue("Swerve/STEER_MOTOR_GEAR_RATIO",
+            "STEER_MOTOR_GEAR_RATIO");
 
-    public LoggedTunableValue LOOP_PERIOD_SECONDS = new LoggedTunableValue("LOOP_PERIOD_SECONDS");
+    public LoggedTunableValue LOOP_PERIOD_SECONDS = new LoggedTunableValue("Swerve/LOOP_PERIOD_SECONDS",
+            "LOOP_PERIOD_SECONDS");
 
     private FlywheelSim driveSim = new FlywheelSim(DCMotor.getFalcon500(1), DRIVE_MOTOR_GEAR_RATIO.getDouble(), 0.02);
     private FlywheelSim turnSim = new FlywheelSim(DCMotor.getFalcon500(1), STEER_MOTOR_GEAR_RATIO.getDouble(),

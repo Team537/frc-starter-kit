@@ -30,16 +30,16 @@ public class LoggedTunableValue {
   private LoggedDashboardString dashboardString;
   private LoggedDashboardBoolean dashboardBoolean;
   private Map<Integer, Object> lastHasChangedValues = new HashMap<>();
-  private boolean TUNING_MODE = (boolean) yamlDataHolder.getProperty("TUNING_MODE");
+  private boolean TUNING_MODE = yamlDataHolder.isTuningMode();
 
   /**
    * Create a new LoggedTunableNumber
    *
    * @param dashboardKey Key on dashboard
    */
-  public LoggedTunableValue(String dashboardKey) {
+  public LoggedTunableValue(String dashboardKey, String yamlKey) {
     this.key = tableKey + "/" + dashboardKey;
-    this.yamlKey = dashboardKey;
+    this.yamlKey = yamlKey;
     initDefault(yamlDataHolder.getProperty(yamlKey));
   }
 
@@ -81,8 +81,11 @@ public class LoggedTunableValue {
 
     if (!hasDefault) {
       return 0.0;
+    } else if (TUNING_MODE) {
+      return dashboardNumber.get();
     } else {
-      return TUNING_MODE ? dashboardNumber.get() : (Double) defaultValue;
+      setDouble((double) defaultValue);
+      return (double) defaultValue;
     }
   }
 
@@ -90,8 +93,11 @@ public class LoggedTunableValue {
 
     if (!hasDefault) {
       return 0;
+    } else if (TUNING_MODE) {
+      return (int) dashboardNumber.get();
     } else {
-      return TUNING_MODE ? (int) dashboardNumber.get() : (int) defaultValue;
+      setInteger((int) defaultValue);
+      return (int) defaultValue;
     }
   }
 
@@ -99,8 +105,11 @@ public class LoggedTunableValue {
 
     if (!hasDefault) {
       return "";
+    } else if (TUNING_MODE) {
+      return dashboardString.get();
     } else {
-      return TUNING_MODE ? dashboardString.get() : defaultValue.toString();
+      setString(defaultValue.toString());
+      return defaultValue.toString();
     }
   }
 
@@ -108,17 +117,37 @@ public class LoggedTunableValue {
 
     if (!hasDefault) {
       return false;
+    } else if (TUNING_MODE) {
+      return dashboardBoolean.get();
     } else {
-      return TUNING_MODE ? dashboardBoolean.get() : (Boolean) defaultValue;
+      setBool((boolean) defaultValue);
+      return (boolean) defaultValue;
     }
   }
 
-  public void set(double value) {
+  public void setDouble(double value) {
     dashboardNumber.set(value);
 
   }
 
+  public void setInteger(int value) {
+    dashboardNumber.set(value);
+
+  }
+
+  public void setString(String value) {
+    dashboardString.set(value);
+
+  }
+
+  public void setBool(boolean value) {
+    dashboardBoolean.set(value);
+
+  }
+
   public void periodic() {
+    TUNING_MODE = yamlDataHolder.isTuningMode();
+
     if (defaultValue instanceof Double) {
       yamlDataHolder.setProperty(yamlKey, getDouble());
     }

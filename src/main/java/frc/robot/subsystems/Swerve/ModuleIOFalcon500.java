@@ -16,29 +16,49 @@ public class ModuleIOFalcon500 implements ModuleIO {
     private WPI_TalonFX steerMotor;
     private final ModulePosition position;
 
-    public LoggedTunableValue FRONT_LEFT_DRIVE_MOTOR_ID = new LoggedTunableValue("FRONT_LEFT_DRIVE_MOTOR_ID");
-    public LoggedTunableValue FRONT_LEFT_STEER_MOTOR_ID = new LoggedTunableValue("FRONT_LEFT_STEER_MOTOR_ID");
-    public LoggedTunableValue FRONT_RIGHT_DRIVE_MOTOR_ID = new LoggedTunableValue("FRONT_RIGHT_DRIVE_MOTOR_ID");
-    public LoggedTunableValue FRONT_RIGHT_STEER_MOTOR_ID = new LoggedTunableValue("FRONT_RIGHT_STEER_MOTOR_ID");
-    public LoggedTunableValue BACK_LEFT_DRIVE_MOTOR_ID = new LoggedTunableValue("BACK_LEFT_DRIVE_MOTOR_ID");
-    public LoggedTunableValue BACK_LEFT_STEER_MOTOR_ID = new LoggedTunableValue("BACK_LEFT_STEER_MOTOR_ID");
-    public LoggedTunableValue BACK_RIGHT_DRIVE_MOTOR_ID = new LoggedTunableValue("BACK_RIGHT_DRIVE_MOTOR_ID");
-    public LoggedTunableValue BACK_RIGHT_STEER_MOTOR_ID = new LoggedTunableValue("BACK_RIGHT_STEER_MOTOR_ID");
+    public LoggedTunableValue FRONT_LEFT_DRIVE_MOTOR_ID = new LoggedTunableValue("Swerve/FRONT_LEFT_DRIVE_MOTOR_ID",
+            "FRONT_LEFT_DRIVE_MOTOR_ID");
+    public LoggedTunableValue FRONT_LEFT_STEER_MOTOR_ID = new LoggedTunableValue("Swerve/FRONT_LEFT_STEER_MOTOR_ID",
+            "FRONT_LEFT_STEER_MOTOR_ID");
+    public LoggedTunableValue FRONT_RIGHT_DRIVE_MOTOR_ID = new LoggedTunableValue("Swerve/FRONT_RIGHT_DRIVE_MOTOR_ID",
+            "FRONT_RIGHT_DRIVE_MOTOR_ID");
+    public LoggedTunableValue FRONT_RIGHT_STEER_MOTOR_ID = new LoggedTunableValue("Swerve/FRONT_RIGHT_STEER_MOTOR_ID",
+            "FRONT_RIGHT_STEER_MOTOR_ID");
+    public LoggedTunableValue BACK_LEFT_DRIVE_MOTOR_ID = new LoggedTunableValue("Swerve/BACK_LEFT_DRIVE_MOTOR_ID",
+            "BACK_LEFT_DRIVE_MOTOR_ID");
+    public LoggedTunableValue BACK_LEFT_STEER_MOTOR_ID = new LoggedTunableValue("Swerve/BACK_LEFT_STEER_MOTOR_ID",
+            "BACK_LEFT_STEER_MOTOR_ID");
+    public LoggedTunableValue BACK_RIGHT_DRIVE_MOTOR_ID = new LoggedTunableValue("Swerve/BACK_RIGHT_DRIVE_MOTOR_ID",
+            "BACK_RIGHT_DRIVE_MOTOR_ID");
+    public LoggedTunableValue BACK_RIGHT_STEER_MOTOR_ID = new LoggedTunableValue("Swerve/BACK_RIGHT_STEER_MOTOR_ID",
+            "BACK_RIGHT_STEER_MOTOR_ID");
 
-    public LoggedTunableValue FRONT_LEFT_DRIVE_INVERTED = new LoggedTunableValue("FRONT_LEFT_DRIVE_INVERTED");
-    public LoggedTunableValue FRONT_LEFT_STEER_INVERTED = new LoggedTunableValue("FRONT_LEFT_STEER_INVERTED");
-    public LoggedTunableValue FRONT_RIGHT_DRIVE_INVERTED = new LoggedTunableValue("FRONT_RIGHT_DRIVE_INVERTED");
-    public LoggedTunableValue FRONT_RIGHT_STEER_INVERTED = new LoggedTunableValue("FRONT_RIGHT_STEER_INVERTED");
-    public LoggedTunableValue BACK_LEFT_DRIVE_INVERTED = new LoggedTunableValue("BACK_LEFT_DRIVE_INVERTED");
-    public LoggedTunableValue BACK_LEFT_STEER_INVERTED = new LoggedTunableValue("BACK_LEFT_STEER_INVERTED");
-    public LoggedTunableValue BACK_RIGHT_DRIVE_INVERTED = new LoggedTunableValue("BACK_RIGHT_DRIVE_INVERTED");
-    public LoggedTunableValue BACK_RIGHT_STEER_INVERTED = new LoggedTunableValue("BACK_RIGHT_STEER_INVERTED");
+    public LoggedTunableValue FRONT_LEFT_DRIVE_INVERTED = new LoggedTunableValue("Swerve/FRONT_LEFT_DRIVE_INVERTED",
+            "FRONT_LEFT_DRIVE_INVERTED");
+    public LoggedTunableValue FRONT_LEFT_STEER_INVERTED = new LoggedTunableValue("Swerve/FRONT_LEFT_STEER_INVERTED",
+            "FRONT_LEFT_STEER_INVERTED");
+    public LoggedTunableValue FRONT_RIGHT_DRIVE_INVERTED = new LoggedTunableValue("Swerve/FRONT_RIGHT_DRIVE_INVERTED",
+            "FRONT_RIGHT_DRIVE_INVERTED");
+    public LoggedTunableValue FRONT_RIGHT_STEER_INVERTED = new LoggedTunableValue("Swerve/FRONT_RIGHT_STEER_INVERTED",
+            "FRONT_RIGHT_STEER_INVERTED");
+    public LoggedTunableValue BACK_LEFT_DRIVE_INVERTED = new LoggedTunableValue("Swerve/BACK_LEFT_DRIVE_INVERTED",
+            "BACK_LEFT_DRIVE_INVERTED");
+    public LoggedTunableValue BACK_LEFT_STEER_INVERTED = new LoggedTunableValue("Swerve/BACK_LEFT_STEER_INVERTED",
+            "BACK_LEFT_STEER_INVERTED");
+    public LoggedTunableValue BACK_RIGHT_DRIVE_INVERTED = new LoggedTunableValue("Swerve/BACK_RIGHT_DRIVE_INVERTED",
+            "BACK_RIGHT_DRIVE_INVERTED");
+    public LoggedTunableValue BACK_RIGHT_STEER_INVERTED = new LoggedTunableValue("Swerve/BACK_RIGHT_STEER_INVERTED",
+            "BACK_RIGHT_STEER_INVERTED");
 
-    public LoggedTunableValue DRIVE_MOTOR_GEAR_RATIO = new LoggedTunableValue("DRIVE_MOTOR_GEAR_RATIO");
-    public LoggedTunableValue STEER_MOTOR_GEAR_RATIO = new LoggedTunableValue("STEER_MOTOR_GEAR_RATIO");
+    public LoggedTunableValue DRIVE_MOTOR_GEAR_RATIO = new LoggedTunableValue("Swerve/DRIVE_MOTOR_GEAR_RATIO",
+            "DRIVE_MOTOR_GEAR_RATIO");
+    public LoggedTunableValue STEER_MOTOR_GEAR_RATIO = new LoggedTunableValue("Swerve/STEER_MOTOR_GEAR_RATIO",
+            "STEER_MOTOR_GEAR_RATIO");
 
-    private LoggedTunableValue TRACK_WIDTH_METERS = new LoggedTunableValue("TRACK_WIDTH_METERS");
-    private LoggedTunableValue WHEEL_RADIUS_METERS = new LoggedTunableValue("WHEEL_RADIUS_METERS");
+    private LoggedTunableValue TRACK_WIDTH_METERS = new LoggedTunableValue("Swerve/TRACK_WIDTH_METERS",
+            "TRACK_WIDTH_METERS");
+    private LoggedTunableValue WHEEL_RADIUS_METERS = new LoggedTunableValue("Swerve/WHEEL_RADIUS_METERS",
+            "WHEEL_RADIUS_METERS");
 
     public static Translation2d[] MODULE_TRANSLATIONS;
 

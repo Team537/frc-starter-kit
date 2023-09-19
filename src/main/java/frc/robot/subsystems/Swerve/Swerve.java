@@ -37,11 +37,15 @@ public class Swerve extends SubsystemBase {
   private Module backLeftModule;
   private Module backRightModule;
 
-  private LoggedTunableValue MAX_SPEED_METERS_PER_SECOND = new LoggedTunableValue("MAX_SPEED_METERS_PER_SECOND");
+  private LoggedTunableValue MAX_SPEED_METERS_PER_SECOND = new LoggedTunableValue("Swerve/MAX_SPEED_METERS_PER_SECOND",
+      "MAX_SPEED_METERS_PER_SECOND");
   private LoggedTunableValue MAX_ROTATION_RADIANS_PER_SECOND = new LoggedTunableValue(
+      "Swerve/MAX_ROTATION_RADIANS_PER_SECOND",
       "MAX_ROTATION_RADIANS_PER_SECOND");
-  private LoggedTunableValue WHEEL_RADIUS_METERS = new LoggedTunableValue("WHEEL_RADIUS_METERS");
-  private LoggedTunableValue TRACK_WIDTH_METERS = new LoggedTunableValue("TRACK_WIDTH_METERS");
+  private LoggedTunableValue WHEEL_RADIUS_METERS = new LoggedTunableValue("Swerve/WHEEL_RADIUS_METERS",
+      "WHEEL_RADIUS_METERS");
+  private LoggedTunableValue TRACK_WIDTH_METERS = new LoggedTunableValue("Swerve/TRACK_WIDTH_METERS",
+      "TRACK_WIDTH_METERS");
 
   private double simYaw = 0;
 

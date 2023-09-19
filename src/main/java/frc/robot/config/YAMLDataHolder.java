@@ -15,9 +15,11 @@ import java.util.Map;
 public class YAMLDataHolder {
     private static YAMLDataHolder instance;
     private Map<String, Object> properties = loadPropertiesFromFile();
+    private boolean TUNING_MODE = (boolean) getProperty("TUNING_MODE");
     // private boolean tuningMode = (boolean) getProperty("tuningMode");
 
     public YAMLDataHolder() {
+        SmartDashboard.putBoolean("TUNING_MODE", TUNING_MODE);
 
     }
 
@@ -65,16 +67,13 @@ public class YAMLDataHolder {
         }
     }
 
-    public void init() {
+    public void periodic() {
+        TUNING_MODE = SmartDashboard.getBoolean("TUNING_MODE", TUNING_MODE);
+        setProperty("TUNING_MODE", TUNING_MODE);
 
     }
 
-    public void periodic() {
-
-        // if(tuningMode){
-
-        // }
-        // saveData();
-
+    public boolean isTuningMode() {
+        return TUNING_MODE;
     }
 }
