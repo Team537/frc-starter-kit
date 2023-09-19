@@ -23,6 +23,7 @@ import frc.robot.subsystems.Swerve.ModuleIO;
 import frc.robot.subsystems.Swerve.ModuleIOFalcon500;
 import frc.robot.subsystems.Swerve.ModuleIOSim;
 import frc.robot.subsystems.Swerve.Swerve;
+import frc.robot.utils.LoggedTunableValue;
 import frc.robot.utils.ModulePosition;
 import frc.robot.utils.RobotMode;
 
@@ -33,6 +34,13 @@ public class RobotContainer {
     private YAMLDataHolder yamlDataHolder;
     private SwerveAutoBuilder swerveAutoBuilder;
     List<PathPlannerTrajectory> pathGroup = PathPlanner.loadPathGroup("Test Path", new PathConstraints(4, 3));
+
+    private LoggedTunableValue PATH_PLANNER_DRIVE_P = new LoggedTunableValue("PATH_PLANNER_DRIVE_P");
+    private LoggedTunableValue PATH_PLANNER_DRIVE_I = new LoggedTunableValue("PATH_PLANNER_DRIVE_I");
+    private LoggedTunableValue PATH_PLANNER_DRIVE_D = new LoggedTunableValue("PATH_PLANNER_DRIVE_D");
+    private LoggedTunableValue PATH_PLANNER_STEER_P = new LoggedTunableValue("PATH_PLANNER_STEER_P");
+    private LoggedTunableValue PATH_PLANNER_STEER_I = new LoggedTunableValue("PATH_PLANNER_STEER_I");
+    private LoggedTunableValue PATH_PLANNER_STEER_D = new LoggedTunableValue("PATH_PLANNER_STEER_D");
 
     HashMap<String, Command> eventMap = new HashMap<>();
 
@@ -73,8 +81,10 @@ public class RobotContainer {
                 swerve::getPoseMeters,
                 swerve::resetOdometry,
                 swerve.getSwerveKinematics(),
-                new PIDConstants(5.0, 0.0, 0.0),
-                new PIDConstants(0.5, 0.0, 0.0),
+                new PIDConstants(PATH_PLANNER_DRIVE_P.getDouble(), PATH_PLANNER_DRIVE_I.getDouble(),
+                        PATH_PLANNER_DRIVE_D.getDouble()),
+                new PIDConstants(PATH_PLANNER_STEER_P.getDouble(), PATH_PLANNER_STEER_I.getDouble(),
+                        PATH_PLANNER_STEER_D.getDouble()),
                 swerve::setSwerveModuleStates,
                 eventMap,
                 true,
@@ -98,6 +108,34 @@ public class RobotContainer {
     }
 
     public void periodic() {
+        if (PATH_PLANNER_DRIVE_D.hasChanged(hashCode()) ||
+                PATH_PLANNER_DRIVE_I.hasChanged(hashCode())
+                || PATH_PLANNER_DRIVE_P.hasChanged(hashCode()) ||
+                PATH_PLANNER_STEER_D.hasChanged(hashCode())
+                || PATH_PLANNER_STEER_I.hasChanged(hashCode()) ||
+                PATH_PLANNER_STEER_P.hasChanged(hashCode())) {
+            swerveAutoBuilder = new SwerveAutoBuilder(
+                    swerve::getPoseMeters,
+                    swerve::resetOdometry,
+                    swerve.getSwerveKinematics(),
+                    new PIDConstants(PATH_PLANNER_DRIVE_P.getDouble(),
+                            PATH_PLANNER_DRIVE_I.getDouble(),
+                            PATH_PLANNER_DRIVE_D.getDouble()),
+                    new PIDConstants(PATH_PLANNER_STEER_P.getDouble(),
+                            PATH_PLANNER_STEER_I.getDouble(),
+                            PATH_PLANNER_STEER_D.getDouble()),
+                    swerve::setSwerveModuleStates,
+                    eventMap,
+                    true,
+                    swerve);
+        }
+
+        PATH_PLANNER_DRIVE_D.periodic();
+        PATH_PLANNER_DRIVE_I.periodic();
+        PATH_PLANNER_DRIVE_P.periodic();
+        PATH_PLANNER_STEER_D.periodic();
+        PATH_PLANNER_STEER_I.periodic();
+        PATH_PLANNER_STEER_P.periodic();
 
     }
 
