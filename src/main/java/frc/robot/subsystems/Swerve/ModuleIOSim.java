@@ -1,13 +1,10 @@
 package frc.robot.subsystems.Swerve;
 
-import org.littletonrobotics.junction.networktables.LoggedDashboardNumber;
-
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.unmanaged.Unmanaged;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.wpilibj.RobotController;
+
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import frc.robot.utils.LoggedTunableValue;
 
