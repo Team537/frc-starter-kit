@@ -2,10 +2,13 @@ package frc.robot.subsystems.Swerve;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import org.littletonrobotics.junction.Logger;
 
 import com.ctre.phoenix.unmanaged.Unmanaged;
+import com.pathplanner.lib.auto.PIDConstants;
+import com.pathplanner.lib.auto.SwerveAutoBuilder;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -19,6 +22,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.Gyro.GyroIO;
 import frc.robot.subsystems.Gyro.GyroIOInputsAutoLogged;
@@ -100,6 +104,10 @@ public class Swerve extends SubsystemBase {
 
   }
 
+  public SwerveDriveKinematics getSwerveKinematics() {
+    return SWERVE_KINEMATICS;
+  }
+
   public void drive(
       double drive,
       double strafe,
@@ -145,6 +153,11 @@ public class Swerve extends SubsystemBase {
     return odometry.getEstimatedPosition();
   }
 
+  public void resetOdometry(Pose2d pose) {
+    odometry.resetPosition(getHeadingRotation2d(), getModulePositions(),
+        pose);
+  }
+
   public void updateOdometry() {
     odometry.update(
         getHeadingRotation2d(),
@@ -168,6 +181,13 @@ public class Swerve extends SubsystemBase {
       map.put(i, swerveModules.get(i).getState());
     }
     return map;
+  }
+
+  public void setSwerveModuleStates(SwerveModuleState[] states) {
+    SwerveDriveKinematics.desaturateWheelSpeeds(states, MAX_SPEED_METERS_PER_SECOND.getDouble());
+
+    for (Module module : ModuleMap.orderedValuesList(swerveModules))
+      module.setDesiredState(states[module.getModulePosition().ordinal()]);
   }
 
   public void updateTunableNumbers() {

@@ -13,6 +13,7 @@ import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.utils.RobotMode;
 
@@ -25,7 +26,9 @@ import frc.robot.utils.RobotMode;
  */
 public class Robot extends LoggedRobot {
 
-  private RobotContainer m_robotContainer;
+  private RobotContainer robotContainer;
+
+  private Command autonomousCommand;
 
   /**
    * This function is run when the robot is first started up and should be used
@@ -73,7 +76,7 @@ public class Robot extends LoggedRobot {
     // Start AdvantageKit logger
     logger.start();
 
-    m_robotContainer = new RobotContainer();
+    robotContainer = new RobotContainer();
 
   }
 
@@ -81,13 +84,18 @@ public class Robot extends LoggedRobot {
   @Override
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
-    m_robotContainer.periodic();
+    robotContainer.periodic();
     SmartDashboard.putData(CommandScheduler.getInstance());
   }
 
   /** This function is called once when autonomous is enabled. */
   @Override
   public void autonomousInit() {
+    autonomousCommand = robotContainer.getAutonomousCommand();
+
+    if (autonomousCommand != null) {
+      autonomousCommand.schedule();
+    }
 
   }
 
@@ -110,7 +118,7 @@ public class Robot extends LoggedRobot {
   /** This function is called once when the robot is disabled. */
   @Override
   public void disabledInit() {
-    m_robotContainer.onDisable();
+    robotContainer.onDisable();
   }
 
   /** This function is called periodically when disabled. */
