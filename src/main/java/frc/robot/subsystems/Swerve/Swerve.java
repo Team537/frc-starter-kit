@@ -65,13 +65,13 @@ public class Swerve extends SubsystemBase {
 
     MODULE_TRANSLATIONS = Map.of(
         ModulePosition.FRONT_LEFT,
-        new Translation2d(-TRACK_WIDTH_METERS_Y.getDouble() / 2, TRACK_WIDTH_METERS_X.getDouble() / 2),
+        new Translation2d(-TRACK_WIDTH_METERS_X.getDouble() / 2, TRACK_WIDTH_METERS_Y.getDouble() / 2),
         ModulePosition.FRONT_RIGHT,
-        new Translation2d(-TRACK_WIDTH_METERS_Y.getDouble() / 2, -TRACK_WIDTH_METERS_X.getDouble() / 2),
+        new Translation2d(-TRACK_WIDTH_METERS_X.getDouble() / 2, -TRACK_WIDTH_METERS_Y.getDouble() / 2),
         ModulePosition.BACK_LEFT,
-        new Translation2d(TRACK_WIDTH_METERS_Y.getDouble() / 2, -TRACK_WIDTH_METERS_X.getDouble() / 2),
+        new Translation2d(TRACK_WIDTH_METERS_X.getDouble() / 2, -TRACK_WIDTH_METERS_Y.getDouble() / 2),
         ModulePosition.BACK_RIGHT,
-        new Translation2d(TRACK_WIDTH_METERS_Y.getDouble() / 2, TRACK_WIDTH_METERS_X.getDouble() / 2));
+        new Translation2d(TRACK_WIDTH_METERS_X.getDouble() / 2, TRACK_WIDTH_METERS_Y.getDouble() / 2));
 
     SWERVE_KINEMATICS = new SwerveDriveKinematics(
         ModuleMap.orderedValues(MODULE_TRANSLATIONS, new Translation2d[0]));
