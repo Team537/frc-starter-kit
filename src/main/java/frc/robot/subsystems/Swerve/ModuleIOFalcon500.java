@@ -6,9 +6,6 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.sensors.CANCoder;
 import com.ctre.phoenix.sensors.CANCoderConfiguration;
 
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-
 import frc.robot.utils.CtreUtils;
 import frc.robot.utils.LoggedTunableValue;
 import frc.robot.utils.ModulePosition;
@@ -82,32 +79,11 @@ public class ModuleIOFalcon500 implements ModuleIO {
     public LoggedTunableValue STEER_MOTOR_GEAR_RATIO = new LoggedTunableValue("Swerve/STEER_MOTOR_GEAR_RATIO",
             "STEER_MOTOR_GEAR_RATIO");
 
-    private LoggedTunableValue TRACK_WIDTH_METERS_X = new LoggedTunableValue("Swerve/TRACK_WIDTH_METERS_X",
-            "TRACK_WIDTH_METERS_X");
-
-    private LoggedTunableValue TRACK_WIDTH_METERS_Y = new LoggedTunableValue("Swerve/TRACK_WIDTH_METERS_Y",
-            "TRACK_WIDTH_METERS_Y");
-
     private LoggedTunableValue WHEEL_RADIUS_METERS = new LoggedTunableValue("Swerve/WHEEL_RADIUS_METERS",
             "WHEEL_RADIUS_METERS");
 
-    public static Translation2d[] MODULE_TRANSLATIONS;
-
-    public static SwerveDriveKinematics DRIVE_KINEMATICS;
-
     public ModuleIOFalcon500(ModulePosition modulePosition) {
         this.position = modulePosition;
-        MODULE_TRANSLATIONS = new Translation2d[] {
-
-                new Translation2d(-TRACK_WIDTH_METERS_X.getDouble() / 2, TRACK_WIDTH_METERS_Y.getDouble() / 2),
-
-                new Translation2d(-TRACK_WIDTH_METERS_X.getDouble() / 2, TRACK_WIDTH_METERS_Y.getDouble() / 2),
-
-                new Translation2d(-TRACK_WIDTH_METERS_X.getDouble() / 2, -TRACK_WIDTH_METERS_Y.getDouble() / 2),
-
-                new Translation2d(-WHEEL_RADIUS_METERS.getDouble() / 2, TRACK_WIDTH_METERS_Y.getDouble() / 2) };
-
-        DRIVE_KINEMATICS = new SwerveDriveKinematics(MODULE_TRANSLATIONS);
 
         switch (position) {
 
@@ -267,21 +243,6 @@ public class ModuleIOFalcon500 implements ModuleIO {
 
         }
 
-        if (TRACK_WIDTH_METERS_Y.hasChanged(hashCode()) || TRACK_WIDTH_METERS_X.hasChanged(hashCode())) {
-            MODULE_TRANSLATIONS = new Translation2d[] {
-
-                    new Translation2d(-TRACK_WIDTH_METERS_X.getDouble() / 2, TRACK_WIDTH_METERS_Y.getDouble() / 2),
-
-                    new Translation2d(-TRACK_WIDTH_METERS_X.getDouble() / 2, TRACK_WIDTH_METERS_Y.getDouble() / 2),
-
-                    new Translation2d(-TRACK_WIDTH_METERS_X.getDouble() / 2, -TRACK_WIDTH_METERS_Y.getDouble() / 2),
-
-                    new Translation2d(-WHEEL_RADIUS_METERS.getDouble() / 2, TRACK_WIDTH_METERS_Y.getDouble() / 2) };
-
-            DRIVE_KINEMATICS = new SwerveDriveKinematics(MODULE_TRANSLATIONS);
-
-        }
-
         FRONT_LEFT_DRIVE_MOTOR_ID.periodic();
         FRONT_LEFT_STEER_MOTOR_ID.periodic();
         FRONT_RIGHT_DRIVE_MOTOR_ID.periodic();
@@ -315,8 +276,6 @@ public class ModuleIOFalcon500 implements ModuleIO {
         STEER_MOTOR_GEAR_RATIO.periodic();
 
         WHEEL_RADIUS_METERS.periodic();
-        TRACK_WIDTH_METERS_X.periodic();
-        TRACK_WIDTH_METERS_Y.periodic();
 
     }
 
