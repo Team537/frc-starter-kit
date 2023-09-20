@@ -52,6 +52,9 @@ public class Module extends SubsystemBase {
   private LoggedTunableValue STEER_I = new LoggedTunableValue("Swerve/STEER_I", "STEER_I");
   private LoggedTunableValue STEER_D = new LoggedTunableValue("Swerve/STEER_D", "STEER_D");
 
+  private LoggedTunableValue USING_ABSOLUTE_ENCODERS = new LoggedTunableValue("Swerve/USING_ABSOLUTE_ENCODERS",
+      "USING_ABSOLUTE_ENCODERS");
+
   private SimpleMotorFeedforward driveFeedforward;
   private SimpleMotorFeedforward steerFeedforward;
   private final PIDController driveFeedback;
@@ -137,7 +140,11 @@ public class Module extends SubsystemBase {
   }
 
   public Rotation2d getAngle() {
-    return new Rotation2d(MathUtil.angleModulus(inputs.steerAbsolutePositionRad));
+
+    if ((boolean) USING_ABSOLUTE_ENCODERS.getBool()) {
+      return new Rotation2d(MathUtil.angleModulus(inputs.steerAbsolutePositionRad));
+    } else
+      return new Rotation2d(MathUtil.angleModulus(inputs.steerPositionRad));
   }
 
   public void stop() {
@@ -179,8 +186,13 @@ public class Module extends SubsystemBase {
   }
 
   public Rotation2d getHeadingRotation2d() {
-    return Rotation2d
-        .fromDegrees(inputs.steerAbsolutePositionRad * (double) STEER_ENCODER_METERS_PER_PULSE.getDouble());
+
+    if ((boolean) USING_ABSOLUTE_ENCODERS.getBool()) {
+      return Rotation2d
+          .fromDegrees(inputs.steerAbsolutePositionRad * (double) STEER_ENCODER_METERS_PER_PULSE.getDouble());
+    } else
+      return Rotation2d
+          .fromDegrees(inputs.steerPositionRad * (double) STEER_ENCODER_METERS_PER_PULSE.getDouble());
   }
 
   @Override
