@@ -39,8 +39,11 @@ public class Swerve extends SubsystemBase {
       "MAX_ROTATION_RADIANS_PER_SECOND");
   private LoggedTunableValue WHEEL_RADIUS_METERS = new LoggedTunableValue("Swerve/WHEEL_RADIUS_METERS",
       "WHEEL_RADIUS_METERS");
-  private LoggedTunableValue TRACK_WIDTH_METERS = new LoggedTunableValue("Swerve/TRACK_WIDTH_METERS",
-      "TRACK_WIDTH_METERS");
+  private LoggedTunableValue TRACK_WIDTH_METERS_X = new LoggedTunableValue("Swerve/TRACK_WIDTH_METERS_X",
+      "TRACK_WIDTH_METERS_X");
+
+  private LoggedTunableValue TRACK_WIDTH_METERS_Y = new LoggedTunableValue("Swerve/TRACK_WIDTH_METERS_Y",
+      "TRACK_WIDTH_METERS_Y");
 
   private double simYaw = 0;
 
@@ -62,13 +65,13 @@ public class Swerve extends SubsystemBase {
 
     MODULE_TRANSLATIONS = Map.of(
         ModulePosition.FRONT_LEFT,
-        new Translation2d(-WHEEL_RADIUS_METERS.getDouble() / 2, TRACK_WIDTH_METERS.getDouble() / 2),
+        new Translation2d(-TRACK_WIDTH_METERS_Y.getDouble() / 2, TRACK_WIDTH_METERS_X.getDouble() / 2),
         ModulePosition.FRONT_RIGHT,
-        new Translation2d(-WHEEL_RADIUS_METERS.getDouble() / 2, -TRACK_WIDTH_METERS.getDouble() / 2),
+        new Translation2d(-TRACK_WIDTH_METERS_Y.getDouble() / 2, -TRACK_WIDTH_METERS_X.getDouble() / 2),
         ModulePosition.BACK_LEFT,
-        new Translation2d(WHEEL_RADIUS_METERS.getDouble() / 2, -TRACK_WIDTH_METERS.getDouble() / 2),
+        new Translation2d(TRACK_WIDTH_METERS_Y.getDouble() / 2, -TRACK_WIDTH_METERS_X.getDouble() / 2),
         ModulePosition.BACK_RIGHT,
-        new Translation2d(WHEEL_RADIUS_METERS.getDouble() / 2, TRACK_WIDTH_METERS.getDouble() / 2));
+        new Translation2d(TRACK_WIDTH_METERS_Y.getDouble() / 2, TRACK_WIDTH_METERS_X.getDouble() / 2));
 
     SWERVE_KINEMATICS = new SwerveDriveKinematics(
         ModuleMap.orderedValues(MODULE_TRANSLATIONS, new Translation2d[0]));
@@ -191,16 +194,16 @@ public class Swerve extends SubsystemBase {
 
   public void updateTunableNumbers() {
 
-    if (TRACK_WIDTH_METERS.hasChanged(hashCode()) || WHEEL_RADIUS_METERS.hasChanged(hashCode())) {
+    if (TRACK_WIDTH_METERS_X.hasChanged(hashCode()) || TRACK_WIDTH_METERS_Y.hasChanged(hashCode())) {
       MODULE_TRANSLATIONS = Map.of(
           ModulePosition.FRONT_LEFT,
-          new Translation2d(-WHEEL_RADIUS_METERS.getDouble() / 2, TRACK_WIDTH_METERS.getDouble() / 2),
+          new Translation2d(-TRACK_WIDTH_METERS_Y.getDouble() / 2, TRACK_WIDTH_METERS_X.getDouble() / 2),
           ModulePosition.FRONT_RIGHT,
-          new Translation2d(-WHEEL_RADIUS_METERS.getDouble() / 2, -TRACK_WIDTH_METERS.getDouble() / 2),
+          new Translation2d(-TRACK_WIDTH_METERS_Y.getDouble() / 2, -TRACK_WIDTH_METERS_X.getDouble() / 2),
           ModulePosition.BACK_LEFT,
-          new Translation2d(WHEEL_RADIUS_METERS.getDouble() / 2, -TRACK_WIDTH_METERS.getDouble() / 2),
+          new Translation2d(TRACK_WIDTH_METERS_Y.getDouble() / 2, -TRACK_WIDTH_METERS_X.getDouble() / 2),
           ModulePosition.BACK_RIGHT,
-          new Translation2d(WHEEL_RADIUS_METERS.getDouble() / 2, TRACK_WIDTH_METERS.getDouble() / 2));
+          new Translation2d(TRACK_WIDTH_METERS_Y.getDouble() / 2, TRACK_WIDTH_METERS_X.getDouble() / 2));
 
       SWERVE_KINEMATICS = new SwerveDriveKinematics(
           ModuleMap.orderedValues(MODULE_TRANSLATIONS, new Translation2d[0]));
@@ -214,7 +217,7 @@ public class Swerve extends SubsystemBase {
 
     MAX_SPEED_METERS_PER_SECOND.periodic();
     MAX_ROTATION_RADIANS_PER_SECOND.periodic();
-    TRACK_WIDTH_METERS.periodic();
+    TRACK_WIDTH_METERS_X.periodic();
     WHEEL_RADIUS_METERS.periodic();
   }
 

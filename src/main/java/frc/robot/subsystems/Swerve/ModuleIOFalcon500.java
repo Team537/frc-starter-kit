@@ -82,8 +82,12 @@ public class ModuleIOFalcon500 implements ModuleIO {
     public LoggedTunableValue STEER_MOTOR_GEAR_RATIO = new LoggedTunableValue("Swerve/STEER_MOTOR_GEAR_RATIO",
             "STEER_MOTOR_GEAR_RATIO");
 
-    private LoggedTunableValue TRACK_WIDTH_METERS = new LoggedTunableValue("Swerve/TRACK_WIDTH_METERS",
-            "TRACK_WIDTH_METERS");
+    private LoggedTunableValue TRACK_WIDTH_METERS_X = new LoggedTunableValue("Swerve/TRACK_WIDTH_METERS_X",
+            "TRACK_WIDTH_METERS_X");
+
+    private LoggedTunableValue TRACK_WIDTH_METERS_Y = new LoggedTunableValue("Swerve/TRACK_WIDTH_METERS_Y",
+            "TRACK_WIDTH_METERS_Y");
+
     private LoggedTunableValue WHEEL_RADIUS_METERS = new LoggedTunableValue("Swerve/WHEEL_RADIUS_METERS",
             "WHEEL_RADIUS_METERS");
 
@@ -95,13 +99,13 @@ public class ModuleIOFalcon500 implements ModuleIO {
         this.position = modulePosition;
         MODULE_TRANSLATIONS = new Translation2d[] {
 
-                new Translation2d(-WHEEL_RADIUS_METERS.getDouble() / 2, TRACK_WIDTH_METERS.getDouble() / 2),
+                new Translation2d(-TRACK_WIDTH_METERS_X.getDouble() / 2, TRACK_WIDTH_METERS_Y.getDouble() / 2),
 
-                new Translation2d(-WHEEL_RADIUS_METERS.getDouble() / 2, TRACK_WIDTH_METERS.getDouble() / 2),
+                new Translation2d(-TRACK_WIDTH_METERS_X.getDouble() / 2, TRACK_WIDTH_METERS_Y.getDouble() / 2),
 
-                new Translation2d(-WHEEL_RADIUS_METERS.getDouble() / 2, -TRACK_WIDTH_METERS.getDouble() / 2),
+                new Translation2d(-TRACK_WIDTH_METERS_X.getDouble() / 2, -TRACK_WIDTH_METERS_Y.getDouble() / 2),
 
-                new Translation2d(-WHEEL_RADIUS_METERS.getDouble() / 2, TRACK_WIDTH_METERS.getDouble() / 2) };
+                new Translation2d(-WHEEL_RADIUS_METERS.getDouble() / 2, TRACK_WIDTH_METERS_Y.getDouble() / 2) };
 
         DRIVE_KINEMATICS = new SwerveDriveKinematics(MODULE_TRANSLATIONS);
 
@@ -263,20 +267,16 @@ public class ModuleIOFalcon500 implements ModuleIO {
 
         }
 
-        if (WHEEL_RADIUS_METERS.hasChanged(hashCode()) || TRACK_WIDTH_METERS.hasChanged(hashCode())) {
+        if (TRACK_WIDTH_METERS_Y.hasChanged(hashCode()) || TRACK_WIDTH_METERS_X.hasChanged(hashCode())) {
             MODULE_TRANSLATIONS = new Translation2d[] {
 
-                    new Translation2d(-(Double) WHEEL_RADIUS_METERS.getDouble() / 2,
-                            (Double) TRACK_WIDTH_METERS.getDouble() / 2),
+                    new Translation2d(-TRACK_WIDTH_METERS_X.getDouble() / 2, TRACK_WIDTH_METERS_Y.getDouble() / 2),
 
-                    new Translation2d(-(Double) WHEEL_RADIUS_METERS.getDouble() / 2,
-                            (Double) TRACK_WIDTH_METERS.getDouble() / 2),
+                    new Translation2d(-TRACK_WIDTH_METERS_X.getDouble() / 2, TRACK_WIDTH_METERS_Y.getDouble() / 2),
 
-                    new Translation2d(-(Double) WHEEL_RADIUS_METERS.getDouble() / 2,
-                            -(Double) TRACK_WIDTH_METERS.getDouble() / 2),
+                    new Translation2d(-TRACK_WIDTH_METERS_X.getDouble() / 2, -TRACK_WIDTH_METERS_Y.getDouble() / 2),
 
-                    new Translation2d(-(Double) WHEEL_RADIUS_METERS.getDouble() / 2,
-                            (Double) TRACK_WIDTH_METERS.getDouble() / 2) };
+                    new Translation2d(-WHEEL_RADIUS_METERS.getDouble() / 2, TRACK_WIDTH_METERS_Y.getDouble() / 2) };
 
             DRIVE_KINEMATICS = new SwerveDriveKinematics(MODULE_TRANSLATIONS);
 
@@ -315,7 +315,8 @@ public class ModuleIOFalcon500 implements ModuleIO {
         STEER_MOTOR_GEAR_RATIO.periodic();
 
         WHEEL_RADIUS_METERS.periodic();
-        TRACK_WIDTH_METERS.periodic();
+        TRACK_WIDTH_METERS_X.periodic();
+        TRACK_WIDTH_METERS_Y.periodic();
 
     }
 
