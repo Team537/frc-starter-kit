@@ -101,7 +101,7 @@ public class RobotContainer {
                                 new SwerveDriveCommand(swerve,
                                                 () -> -controller.getLeftY(),
                                                 () -> controller.getLeftX(),
-                                                () -> controller.getRightX(), true)
+                                                () -> -controller.getRightX(), true)
 
                 );
 
