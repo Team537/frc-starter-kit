@@ -26,7 +26,7 @@ import frc.robot.utils.RobotMode;
 
 public class RobotContainer {
         private Swerve swerve;
-        public static RobotMode mode = RobotMode.SIM;
+        public static RobotMode mode = RobotMode.REAL;
         private XboxController controller;
         private YAMLDataHolder yamlDataHolder;
         private SwerveAutoBuilder swerveAutoBuilder;

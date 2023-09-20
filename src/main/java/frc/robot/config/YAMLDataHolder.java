@@ -1,6 +1,5 @@
 package frc.robot.config;
 
-import org.littletonrobotics.junction.networktables.LoggedDashboardNumber;
 import org.yaml.snakeyaml.Yaml;
 
 import edu.wpi.first.wpilibj.Filesystem;
@@ -44,7 +43,6 @@ public class YAMLDataHolder {
 
     }
 
-    @SuppressWarnings("unchecked")
     private Map<String, Object> loadPropertiesFromFile() {
         try {
             Yaml yaml = new Yaml();

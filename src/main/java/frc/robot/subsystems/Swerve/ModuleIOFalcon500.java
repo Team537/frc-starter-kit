@@ -3,6 +3,8 @@ package frc.robot.subsystems.Swerve;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
+import com.ctre.phoenix.sensors.CANCoder;
+import com.ctre.phoenix.sensors.CANCoderConfiguration;
 
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -14,6 +16,7 @@ import frc.robot.utils.ModulePosition;
 public class ModuleIOFalcon500 implements ModuleIO {
     private WPI_TalonFX driveMotor;
     private WPI_TalonFX steerMotor;
+    private CANCoder absoluteEncoder;
     private final ModulePosition position;
 
     public LoggedTunableValue FRONT_LEFT_DRIVE_MOTOR_ID = new LoggedTunableValue("Swerve/FRONT_LEFT_DRIVE_MOTOR_ID",
@@ -50,6 +53,30 @@ public class ModuleIOFalcon500 implements ModuleIO {
     public LoggedTunableValue BACK_RIGHT_STEER_INVERTED = new LoggedTunableValue("Swerve/BACK_RIGHT_STEER_INVERTED",
             "BACK_RIGHT_STEER_INVERTED");
 
+    public LoggedTunableValue FRONT_LEFT_CANCODER_ID = new LoggedTunableValue("Swerve/FRONT_LEFT_CANCODER_ID",
+            "FRONT_LEFT_CANCODER_ID");
+
+    public LoggedTunableValue FRONT_RIGHT_CANCODER_ID = new LoggedTunableValue("Swerve/FRONT_RIGHT_CANCODER_ID",
+            "FRONT_RIGHT_CANCODER_ID");
+
+    public LoggedTunableValue BACK_LEFT_CANCODER_ID = new LoggedTunableValue("Swerve/BACK_LEFT_CANCODER_ID",
+            "BACK_LEFT_CANCODER_ID");
+
+    public LoggedTunableValue BACK_RIGHT_CANCODER_ID = new LoggedTunableValue("Swerve/BACK_RIGHT_CANCODER_ID",
+            "BACK_RIGHT_CANCODER_ID");
+
+    public LoggedTunableValue FRONT_LEFT_CANCODER_OFFSET = new LoggedTunableValue("Swerve/FRONT_LEFT_CANCODER_OFFSET",
+            "FRONT_LEFT_CANCODER_OFFSET");
+
+    public LoggedTunableValue FRONT_RIGHT_CANCODER_OFFSET = new LoggedTunableValue("Swerve/FRONT_RIGHT_CANCODER_OFFSET",
+            "FRONT_RIGHT_CANCODER_OFFSET");
+
+    public LoggedTunableValue BACK_LEFT_CANCODER_OFFSET = new LoggedTunableValue("Swerve/BACK_LEFT_CANCODER_OFFSET",
+            "BACK_LEFT_CANCODER_OFFSET");
+
+    public LoggedTunableValue BACK_RIGHT_CANCODER_OFFSET = new LoggedTunableValue("Swerve/BACK_RIGHT_CANCODER_OFFSET",
+            "BACK_RIGHT_CANCODER_OFFSET");
+
     public LoggedTunableValue DRIVE_MOTOR_GEAR_RATIO = new LoggedTunableValue("Swerve/DRIVE_MOTOR_GEAR_RATIO",
             "DRIVE_MOTOR_GEAR_RATIO");
     public LoggedTunableValue STEER_MOTOR_GEAR_RATIO = new LoggedTunableValue("Swerve/STEER_MOTOR_GEAR_RATIO",
@@ -85,6 +112,9 @@ public class ModuleIOFalcon500 implements ModuleIO {
                 steerMotor = new WPI_TalonFX((int) FRONT_LEFT_STEER_MOTOR_ID.getInteger());
                 driveMotor.setInverted((Boolean) FRONT_LEFT_DRIVE_INVERTED.getBool());
                 steerMotor.setInverted((Boolean) FRONT_LEFT_STEER_INVERTED.getBool());
+                absoluteEncoder = new CANCoder((int) FRONT_LEFT_CANCODER_ID.getInteger());
+                absoluteEncoder.setPosition((double) FRONT_LEFT_CANCODER_OFFSET.getDouble());
+
                 break;
 
             case FRONT_RIGHT:
@@ -92,12 +122,16 @@ public class ModuleIOFalcon500 implements ModuleIO {
                 steerMotor = new WPI_TalonFX((int) FRONT_RIGHT_STEER_MOTOR_ID.getInteger());
                 driveMotor.setInverted((Boolean) FRONT_RIGHT_DRIVE_INVERTED.getBool());
                 steerMotor.setInverted((Boolean) FRONT_RIGHT_STEER_INVERTED.getBool());
+                absoluteEncoder = new CANCoder((int) FRONT_RIGHT_CANCODER_ID.getInteger());
+                absoluteEncoder.setPosition((double) FRONT_RIGHT_CANCODER_OFFSET.getDouble());
                 break;
             case BACK_LEFT:
                 driveMotor = new WPI_TalonFX((int) BACK_LEFT_DRIVE_MOTOR_ID.getInteger());
                 steerMotor = new WPI_TalonFX((int) BACK_LEFT_STEER_MOTOR_ID.getInteger());
                 driveMotor.setInverted((Boolean) BACK_LEFT_DRIVE_INVERTED.getBool());
                 steerMotor.setInverted((Boolean) BACK_LEFT_STEER_INVERTED.getBool());
+                absoluteEncoder = new CANCoder((int) BACK_LEFT_CANCODER_ID.getInteger());
+                absoluteEncoder.setPosition((double) BACK_LEFT_CANCODER_OFFSET.getDouble());
 
                 break;
             case BACK_RIGHT:
@@ -105,6 +139,8 @@ public class ModuleIOFalcon500 implements ModuleIO {
                 steerMotor = new WPI_TalonFX((int) BACK_RIGHT_STEER_MOTOR_ID.getInteger());
                 driveMotor.setInverted((Boolean) BACK_RIGHT_DRIVE_INVERTED.getBool());
                 steerMotor.setInverted((Boolean) BACK_RIGHT_STEER_INVERTED.getBool());
+                absoluteEncoder = new CANCoder((int) BACK_RIGHT_CANCODER_ID.getInteger());
+                absoluteEncoder.setPosition((double) BACK_RIGHT_CANCODER_OFFSET.getDouble());
                 break;
             default:
                 throw new RuntimeException("Invalid module index for Swerve");
@@ -118,6 +154,15 @@ public class ModuleIOFalcon500 implements ModuleIO {
 
         steerMotor.configFactoryDefault();
         steerMotor.configAllSettings(CtreUtils.generateTurnMotorConfig());
+        steerMotor.setSensorPhase(true);
+        steerMotor.setSafetyEnabled(true);
+        steerMotor.enableVoltageCompensation(true);
+
+        CANCoderConfiguration canCoderConfig = CtreUtils.generateCanCoderConfig();
+        absoluteEncoder.configAllSettings(canCoderConfig);
+
+        // steerMotor.setSelectedSensorPosition(absoluteEncoder.getPosition() * 2048 /
+        // 360);
 
     }
 
@@ -135,7 +180,8 @@ public class ModuleIOFalcon500 implements ModuleIO {
         inputs.driveCurrentAmps = new double[] { driveMotor.getSupplyCurrent() };
         inputs.driveTemperatureCelcius = new double[] { driveMotor.getTemperature() };
 
-        inputs.steerAbsolutePositionRad = 0; // Temporary, wait until Mag Encoder Implementation
+        inputs.steerAbsolutePositionRad = absoluteEncoder.getPosition() * 2 * Math.PI
+                / (double) STEER_MOTOR_GEAR_RATIO.getDouble();
         inputs.steerPositionRad = steerMotor.getSelectedSensorPosition() * 2 * Math.PI
                 / (2048 * (double) STEER_MOTOR_GEAR_RATIO.getDouble());
 
@@ -165,7 +211,15 @@ public class ModuleIOFalcon500 implements ModuleIO {
                 BACK_RIGHT_DRIVE_MOTOR_ID.hasChanged(hashCode()) ||
                 BACK_RIGHT_DRIVE_INVERTED.hasChanged(hashCode()) ||
                 BACK_RIGHT_STEER_MOTOR_ID.hasChanged(hashCode()) ||
-                BACK_RIGHT_STEER_INVERTED.hasChanged(hashCode())) {
+                BACK_RIGHT_STEER_INVERTED.hasChanged(hashCode()) ||
+                FRONT_LEFT_CANCODER_ID.hasChanged(hashCode()) ||
+                FRONT_LEFT_CANCODER_OFFSET.hasChanged(hashCode()) ||
+                FRONT_RIGHT_CANCODER_ID.hasChanged(hashCode()) ||
+                FRONT_RIGHT_CANCODER_OFFSET.hasChanged(hashCode()) ||
+                BACK_LEFT_CANCODER_ID.hasChanged(hashCode()) ||
+                BACK_LEFT_CANCODER_OFFSET.hasChanged(hashCode()) ||
+                BACK_RIGHT_CANCODER_ID.hasChanged(hashCode()) ||
+                BACK_RIGHT_CANCODER_OFFSET.hasChanged(hashCode())) {
             switch (position) {
 
                 case FRONT_LEFT:
@@ -173,6 +227,8 @@ public class ModuleIOFalcon500 implements ModuleIO {
                     steerMotor = new WPI_TalonFX((int) FRONT_LEFT_STEER_MOTOR_ID.getInteger());
                     driveMotor.setInverted(FRONT_LEFT_DRIVE_INVERTED.getBool());
                     steerMotor.setInverted(FRONT_LEFT_STEER_INVERTED.getBool());
+                    absoluteEncoder = new CANCoder((int) FRONT_LEFT_CANCODER_ID.getInteger());
+                    absoluteEncoder.setPosition((double) FRONT_LEFT_CANCODER_OFFSET.getDouble());
                     break;
 
                 case FRONT_RIGHT:
@@ -180,12 +236,16 @@ public class ModuleIOFalcon500 implements ModuleIO {
                     steerMotor = new WPI_TalonFX((int) FRONT_RIGHT_STEER_MOTOR_ID.getInteger());
                     driveMotor.setInverted(FRONT_RIGHT_DRIVE_INVERTED.getBool());
                     steerMotor.setInverted(FRONT_RIGHT_STEER_INVERTED.getBool());
+                    absoluteEncoder = new CANCoder((int) FRONT_RIGHT_CANCODER_ID.getInteger());
+                    absoluteEncoder.setPosition((double) FRONT_RIGHT_CANCODER_OFFSET.getDouble());
                     break;
                 case BACK_LEFT:
                     driveMotor = new WPI_TalonFX((int) BACK_LEFT_DRIVE_MOTOR_ID.getInteger());
                     steerMotor = new WPI_TalonFX((int) BACK_LEFT_STEER_MOTOR_ID.getInteger());
                     driveMotor.setInverted(BACK_LEFT_DRIVE_INVERTED.getBool());
                     steerMotor.setInverted(BACK_LEFT_STEER_INVERTED.getBool());
+                    absoluteEncoder = new CANCoder((int) BACK_LEFT_CANCODER_ID.getInteger());
+                    absoluteEncoder.setPosition((double) BACK_LEFT_CANCODER_OFFSET.getDouble());
 
                     break;
                 case BACK_RIGHT:
@@ -193,6 +253,8 @@ public class ModuleIOFalcon500 implements ModuleIO {
                     steerMotor = new WPI_TalonFX((int) BACK_RIGHT_STEER_MOTOR_ID.getInteger());
                     driveMotor.setInverted(BACK_RIGHT_DRIVE_INVERTED.getBool());
                     steerMotor.setInverted(BACK_RIGHT_STEER_INVERTED.getBool());
+                    absoluteEncoder = new CANCoder((int) BACK_RIGHT_CANCODER_ID.getInteger());
+                    absoluteEncoder.setPosition((double) BACK_RIGHT_CANCODER_OFFSET.getDouble());
                     break;
                 default:
                     throw new RuntimeException("Invalid module index for Swerve");
@@ -238,6 +300,16 @@ public class ModuleIOFalcon500 implements ModuleIO {
         BACK_LEFT_STEER_INVERTED.periodic();
         BACK_RIGHT_DRIVE_INVERTED.periodic();
         BACK_RIGHT_STEER_INVERTED.periodic();
+
+        FRONT_LEFT_CANCODER_ID.periodic();
+        FRONT_RIGHT_CANCODER_ID.periodic();
+        BACK_LEFT_CANCODER_ID.periodic();
+        BACK_RIGHT_CANCODER_ID.periodic();
+
+        FRONT_LEFT_CANCODER_OFFSET.periodic();
+        FRONT_RIGHT_CANCODER_OFFSET.periodic();
+        BACK_LEFT_CANCODER_OFFSET.periodic();
+        BACK_RIGHT_CANCODER_OFFSET.periodic();
 
         DRIVE_MOTOR_GEAR_RATIO.periodic();
         STEER_MOTOR_GEAR_RATIO.periodic();

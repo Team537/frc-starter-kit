@@ -22,10 +22,10 @@ public class ModuleIOSim implements ModuleIO {
     private FlywheelSim turnSim = new FlywheelSim(DCMotor.getFalcon500(1), STEER_MOTOR_GEAR_RATIO.getDouble(),
             0.03);
 
-    public double turnPositionRad = 0;
-    public double turnAbsolutePositionRad = 0;
+    public double steerPositionRad = 0;
+    public double steerAbsolutePositionRad = Math.random() * 2.0 * Math.PI;
     public double driveVolts = 0;
-    public double turnVolts = 0;
+    public double steerVolts = 0;
 
     public void updateInputs(ModuleIOInputs inputs) {
         updateTunableNumbers();
@@ -34,15 +34,15 @@ public class ModuleIOSim implements ModuleIO {
         turnSim.update(LOOP_PERIOD_SECONDS.getDouble());
 
         double angleDiffRad = turnSim.getAngularVelocityRadPerSec() * LOOP_PERIOD_SECONDS.getDouble();
-        turnAbsolutePositionRad += angleDiffRad;
-        turnPositionRad += angleDiffRad;
+        steerAbsolutePositionRad += angleDiffRad;
+        steerPositionRad += angleDiffRad;
 
-        while (turnAbsolutePositionRad < 0) {
-            turnAbsolutePositionRad += 2.0 * Math.PI;
+        while (steerAbsolutePositionRad < 0) {
+            steerAbsolutePositionRad += 2.0 * Math.PI;
         }
 
-        while (turnAbsolutePositionRad > 0) {
-            turnAbsolutePositionRad -= 2.0 * Math.PI;
+        while (steerAbsolutePositionRad > 0) {
+            steerAbsolutePositionRad -= 2.0 * Math.PI;
         }
 
         inputs.drivePositionRad = inputs.drivePositionRad
@@ -52,10 +52,10 @@ public class ModuleIOSim implements ModuleIO {
         inputs.driveCurrentAmps = new double[] { driveSim.getCurrentDrawAmps() };
         inputs.driveTemperatureCelcius = new double[] {};
 
-        inputs.steerAbsolutePositionRad = turnAbsolutePositionRad;
-        inputs.steerPositionRad = turnPositionRad;
+        inputs.steerAbsolutePositionRad = steerAbsolutePositionRad;
+        inputs.steerPositionRad = steerPositionRad;
         inputs.steerVelocityRadPerSec = turnSim.getAngularVelocityRadPerSec();
-        inputs.steerAppliedVolts = turnVolts;
+        inputs.steerAppliedVolts = steerVolts;
         inputs.steerCurrentAmps = new double[] { turnSim.getCurrentDrawAmps() };
         inputs.steerTemperatureCelcius = new double[] {};
         Unmanaged.feedEnable(20);
@@ -72,8 +72,8 @@ public class ModuleIOSim implements ModuleIO {
 
     public void setSteerVoltage(double volts) {
 
-        turnVolts = MathUtil.clamp(volts, -12.0, 12.0);
-        turnSim.setInputVoltage(turnVolts);
+        steerVolts = MathUtil.clamp(volts, -12.0, 12.0);
+        turnSim.setInputVoltage(steerVolts);
 
     }
 
