@@ -122,6 +122,7 @@ public class Module extends SubsystemBase {
     STEER_P.periodic();
     STEER_I.periodic();
     STEER_D.periodic();
+    USING_ABSOLUTE_ENCODERS.periodic();
   }
 
   public void setDesiredState(SwerveModuleState state) {
