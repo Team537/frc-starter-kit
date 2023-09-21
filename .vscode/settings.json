@@ -1,0 +1,78 @@
+{
+  "java.configuration.updateBuildConfiguration": "automatic",
+  "java.server.launchMode": "Standard",
+  "files.exclude": {
+    "**/.git": true,
+    "**/.svn": true,
+    "**/.hg": true,
+    "**/CVS": true,
+    "**/.DS_Store": true,
+    "bin/": true,
+    "**/.classpath": true,
+    "**/.project": true,
+    "**/.settings": true,
+    "**/.factorypath": true,
+    "**/*~": true
+  },  
+
+  "java.test.config": [
+    {
+      "name": "WPIlibUnitTests",
+      "workingDirectory": "${workspaceFolder}/build/jni/release",
+      "vmargs": [
+        "-Djava.library.path=${workspaceFolder}/build/jni/release"
+      ],
+      "env": {
+        "LD_LIBRARY_PATH": "${workspaceFolder}/build/jni/release",
+        "DYLD_LIBRARY_PATH": "${workspaceFolder}/build/jni/release"
+      }
+    },
+  ],
+  "java.test.defaultConfig": "WPIlibUnitTests",
+  "wpilib.selectDefaultSimulateExtension": true,
+  "wpilib.stopSimulationOnEntry": false,
+  "java.jdt.ls.vmargs": "-XX:+UseParallelGC -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Dsun.zip.disableMemoryMapping=true -Xmx2G -Xms100m -Xlog:disable",
+  "wpilib.deployOffline": true,
+  "java.debug.settings.onBuildFailureProceed": true
+
+  
+ "[java]": {
+    //"editor.formatOnSave": true: This option tells VSCode to format the code automatically when you save the file.
+    "editor.formatOnSave": true,
+
+    //"editor.formatOnType": true: This option tells VSCode to format the code automatically as you type.
+    "editor.formatOnType": true,
+
+    //"editor.tabSize": 2: This option sets the number of spaces to use for each tab in the code.
+    "editor.tabSize": 2,
+
+    //"editor.rulers" : [125],: This option shows a vertical line at column 125, which is a common guideline for keeping code within a certain width to improve readability.
+    "editor.rulers" : [136],
+
+    //"editor.wordWrapColumn": 125: This option sets the column number at which to wrap the line.
+    "editor.wordWrapColumn": 140,
+
+    //"editor.wordWrap" : "on",: This option tells VSCode to wrap long lines of code to the next line.
+    "editor.wordWrap" : "bounded",
+
+    //"editor.wrappingIndent": "same",: This option sets the indentation level for wrapped lines to be the same as the original line.
+    "editor.wrappingIndent": "same",
+
+    //"editor.insertSpaces": false,: This option tells VSCode to use tabs instead of spaces for indentation.
+    "editor.insertSpaces": false,
+
+    //"editor.renderWhitespace": "none",: This option tells VSCode not to show any whitespace characters such as spaces or tabs in the code.
+    "editor.renderWhitespace": "none",
+
+    //"editor.autoClosingBrackets": "always",: This option tells VSCode to automatically add closing brackets whenever you type an opening bracket.
+    "editor.autoClosingBrackets": "always",
+
+    //"editor.autoIndent": "full",: This option tells VSCode to automatically indent the code as you type.
+    "editor.autoIndent": "full",
+
+    //"editor.bracketPairColorization.enabled" : true,: This option enables bracket pair colorization, which highlights matching brackets and parentheses with different colors to make it easier to see where a block of code begins and ends.
+    "editor.bracketPairColorization.enabled" : true,
+ }
+
+}
+
