@@ -16,6 +16,9 @@ public class SwerveDriveCommand extends CommandBase {
   private final DoubleSupplier strafe;
   private final DoubleSupplier rotation;
   private final Boolean fieldOriented;
+  private double xSpeed;
+  private double ySpeed;
+  private double rotSpeed;
 
   /** Creates a new SwerveDriveCommand. */
   public SwerveDriveCommand(Swerve swerve, DoubleSupplier forward, DoubleSupplier strafe, DoubleSupplier rotation,
@@ -38,7 +41,28 @@ public class SwerveDriveCommand extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    swerve.drive(forward.getAsDouble(), strafe.getAsDouble(), rotation.getAsDouble(), fieldOriented);
+    if (Math.abs(forward.getAsDouble()) < 0.01) {
+      xSpeed = 0;
+    } else {
+      xSpeed = forward.getAsDouble();
+
+    }
+
+    if (Math.abs(strafe.getAsDouble()) < 0.01) {
+      ySpeed = 0;
+    } else {
+      ySpeed = strafe.getAsDouble();
+
+    }
+
+    if (Math.abs(rotation.getAsDouble()) < 0.01) {
+      rotSpeed = 0;
+    } else {
+      rotSpeed = rotation.getAsDouble();
+
+    }
+
+    swerve.drive(xSpeed, ySpeed, rotSpeed, fieldOriented);
   }
 
   // Called once the command ends or is interrupted.
