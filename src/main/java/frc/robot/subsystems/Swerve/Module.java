@@ -10,7 +10,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
+import frc.robot.utils.CtreUtils;
 import frc.robot.utils.LoggedTunableValue;
 import frc.robot.utils.ModulePosition;
 
@@ -126,7 +126,7 @@ public class Module extends SubsystemBase {
   }
 
   public void setDesiredState(SwerveModuleState state) {
-    var optimizedState = SwerveModuleState.optimize(state, getAngle());
+    var optimizedState = CtreUtils.optimize(state, getAngle());
 
     io.setSteerVoltage(steerFeedforward.calculate(optimizedState.angle.getRadians())
         +
@@ -174,7 +174,7 @@ public class Module extends SubsystemBase {
     return new SwerveModuleState(getVelocityMetersPerSec(), getAngle());
   }
 
-  public frc.robot.utils.ModulePosition getModulePosition() {
+  public ModulePosition getModulePosition() {
     return position;
   }
 
@@ -190,10 +190,10 @@ public class Module extends SubsystemBase {
 
     if ((boolean) USING_ABSOLUTE_ENCODERS.getBool()) {
       return Rotation2d
-          .fromDegrees(inputs.steerAbsolutePositionRad * (double) STEER_ENCODER_METERS_PER_PULSE.getDouble());
+          .fromRadians(inputs.steerAbsolutePositionRad);
     } else
       return Rotation2d
-          .fromDegrees(inputs.steerPositionRad * (double) STEER_ENCODER_METERS_PER_PULSE.getDouble());
+          .fromRadians(inputs.steerPositionRad);
   }
 
   @Override

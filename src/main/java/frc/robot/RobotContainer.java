@@ -9,11 +9,13 @@ import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.auto.PIDConstants;
 import com.pathplanner.lib.auto.SwerveAutoBuilder;
 
+import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 
 import frc.robot.commands.SwerveDriveCommand;
 import frc.robot.config.YAMLDataHolder;
+import frc.robot.simulation.FieldSim;
 import frc.robot.subsystems.Gyro.GyroIO;
 import frc.robot.subsystems.Gyro.GyroIOPigeon2;
 import frc.robot.subsystems.Swerve.ModuleIO;
@@ -29,6 +31,7 @@ public class RobotContainer {
         public static RobotMode mode = RobotMode.SIM;
         private XboxController controller;
         private YAMLDataHolder yamlDataHolder;
+        private FieldSim fieldSim;
         private SwerveAutoBuilder swerveAutoBuilder;
         List<PathPlannerTrajectory> pathGroup = PathPlanner.loadPathGroup("Test Path", new PathConstraints(4, 3));
 
@@ -60,6 +63,7 @@ public class RobotContainer {
                                                 new ModuleIOFalcon500(ModulePosition.FRONT_RIGHT),
                                                 new ModuleIOFalcon500(ModulePosition.BACK_LEFT),
                                                 new ModuleIOFalcon500(ModulePosition.BACK_RIGHT));
+
                                 break;
                         case SIM:
                                 swerve = new Swerve(new GyroIOPigeon2(),
@@ -82,6 +86,8 @@ public class RobotContainer {
 
                                 break;
                 }
+
+                fieldSim = new FieldSim(swerve);
 
                 swerveAutoBuilder = new SwerveAutoBuilder(
                                 swerve::getPoseMeters,
@@ -114,6 +120,8 @@ public class RobotContainer {
         }
 
         public void periodic() {
+
+                fieldSim.periodic();
 
                 if (PATH_PLANNER_DRIVE_D.hasChanged(hashCode()) ||
                                 PATH_PLANNER_DRIVE_I.hasChanged(hashCode())
@@ -153,6 +161,10 @@ public class RobotContainer {
         }
 
         public Command getAutonomousCommand() {
+                for (Trajectory path : pathGroup) {
+                        fieldSim.setTrajectory(path);
+                }
+
                 return swerveAutoBuilder.fullAuto(pathGroup);
         }
 

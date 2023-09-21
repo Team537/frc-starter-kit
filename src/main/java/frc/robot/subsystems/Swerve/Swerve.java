@@ -110,6 +110,14 @@ public class Swerve extends SubsystemBase {
     return SWERVE_KINEMATICS;
   }
 
+  public Map<ModulePosition, Translation2d> getModuleTranslations() {
+    return MODULE_TRANSLATIONS;
+  }
+
+  public Module getModule(ModulePosition modulePosition) {
+    return swerveModules.get(modulePosition);
+  }
+
   public void drive(
       double drive,
       double strafe,

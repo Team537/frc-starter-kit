@@ -27,6 +27,10 @@ public class ModuleIOSim implements ModuleIO {
     public double driveVolts = 0;
     public double steerVolts = 0;
 
+    public ModuleIOSim() {
+
+    }
+
     public void updateInputs(ModuleIOInputs inputs) {
         updateTunableNumbers();
 
