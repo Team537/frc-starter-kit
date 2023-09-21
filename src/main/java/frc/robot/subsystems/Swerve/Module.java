@@ -57,12 +57,18 @@ public class Module extends SubsystemBase {
   private LoggedTunableValue USING_CANCODERS = new LoggedTunableValue("Swerve/USING_CANCODERS",
       "USING_CANCODERS");
 
+  private LoggedTunableValue SLEW_RATE_ACCEL = new LoggedTunableValue("Swerve/SLEW_RATE_ACCEL",
+      "SLEW_RATE_ACCEL");
+
+  private LoggedTunableValue SLEW_RATE_DECEL = new LoggedTunableValue("Swerve/SLEW_RATE_DECEL",
+      "SLEW_RATE_DECEL");
+
   private SimpleMotorFeedforward driveFeedforward;
   private SimpleMotorFeedforward steerFeedforward;
   private final PIDController driveFeedback;
 
   private final PIDController steerFeedback;
-  public AccelerationLimiter accel = new AccelerationLimiter(15, 10);
+  public AccelerationLimiter accel;
 
   public Module(ModuleIO io, ModulePosition position) {
     this.io = io;
@@ -77,6 +83,8 @@ public class Module extends SubsystemBase {
         (double) DRIVE_D.getDouble());
     steerFeedback = new PIDController((double) STEER_P.getDouble(), (double) STEER_I.getDouble(),
         (double) STEER_D.getDouble());
+
+    accel = new AccelerationLimiter((double) SLEW_RATE_ACCEL.getInteger(), (double) SLEW_RATE_DECEL.getInteger());
 
   }
 
@@ -125,7 +133,17 @@ public class Module extends SubsystemBase {
     STEER_P.periodic();
     STEER_I.periodic();
     STEER_D.periodic();
+    SLEW_RATE_ACCEL.periodic();
+    SLEW_RATE_DECEL.periodic();
     USING_CANCODERS.periodic();
+  }
+
+  public void onDisable() {
+    if (SLEW_RATE_ACCEL.hasChanged(hashCode()) || SLEW_RATE_DECEL.hasChanged(hashCode())) {
+      accel = new AccelerationLimiter((double) SLEW_RATE_ACCEL.getInteger(), (double) SLEW_RATE_DECEL.getInteger());
+    }
+
+    stop();
   }
 
   public void setDesiredState(SwerveModuleState state) {

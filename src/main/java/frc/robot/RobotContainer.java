@@ -118,6 +118,7 @@ public class RobotContainer {
         public void onDisable() {
                 swerve.stop();
                 yamlDataHolder.saveData();
+                swerve.onDisable();
 
         }
 

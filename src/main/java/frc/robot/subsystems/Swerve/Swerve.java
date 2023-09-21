@@ -31,6 +31,7 @@ public class Swerve extends SubsystemBase {
   private Module frontRightModule;
   private Module backLeftModule;
   private Module backRightModule;
+  private Pose2d poseMeters = new Pose2d();
 
   private LoggedTunableValue MAX_SPEED_METERS_PER_SECOND = new LoggedTunableValue("Swerve/MAX_SPEED_METERS_PER_SECOND",
       "MAX_SPEED_METERS_PER_SECOND");
@@ -160,7 +161,7 @@ public class Swerve extends SubsystemBase {
   }
 
   public Pose2d getPoseMeters() {
-    return odometry.getEstimatedPosition();
+    return poseMeters;
   }
 
   public void resetOdometry(Pose2d pose) {
@@ -252,5 +253,37 @@ public class Swerve extends SubsystemBase {
         ModuleMap.orderedValues(getModuleStates(), new SwerveModuleState[0]));
     Logger.getInstance().processInputs("Gyro", gyroInputs);
 
+    poseMeters = odometry.getEstimatedPosition();
+
+  }
+
+  public void onDisable() {
+    for (Module module : ModuleMap.orderedValuesList(swerveModules)) {
+
+      module.onDisable();
+
+      if (TRACK_WIDTH_METERS_X.hasChanged(hashCode()) || TRACK_WIDTH_METERS_Y.hasChanged(hashCode())) {
+        MODULE_TRANSLATIONS = Map.of(
+            ModulePosition.FRONT_LEFT,
+            new Translation2d(-TRACK_WIDTH_METERS_Y.getDouble() / 2, TRACK_WIDTH_METERS_X.getDouble() / 2),
+            ModulePosition.FRONT_RIGHT,
+            new Translation2d(-TRACK_WIDTH_METERS_Y.getDouble() / 2, -TRACK_WIDTH_METERS_X.getDouble() / 2),
+            ModulePosition.BACK_LEFT,
+            new Translation2d(TRACK_WIDTH_METERS_Y.getDouble() / 2, -TRACK_WIDTH_METERS_X.getDouble() / 2),
+            ModulePosition.BACK_RIGHT,
+            new Translation2d(TRACK_WIDTH_METERS_Y.getDouble() / 2, TRACK_WIDTH_METERS_X.getDouble() / 2));
+
+        SWERVE_KINEMATICS = new SwerveDriveKinematics(
+            ModuleMap.orderedValues(MODULE_TRANSLATIONS, new Translation2d[0]));
+
+        odometry = new SwerveDrivePoseEstimator(
+            SWERVE_KINEMATICS,
+            getHeadingRotation2d(),
+            getModulePositions(),
+            new Pose2d());
+
+        odometry.resetPosition(getHeadingRotation2d(), getModulePositions(), poseMeters);
+      }
+    }
   }
 }
