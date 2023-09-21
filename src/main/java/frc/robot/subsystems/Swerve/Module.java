@@ -10,6 +10,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.utils.AccelerationLimiter;
 import frc.robot.utils.CtreUtils;
 import frc.robot.utils.LoggedTunableValue;
 import frc.robot.utils.ModulePosition;
@@ -31,6 +32,7 @@ public class Module extends SubsystemBase {
   private LoggedTunableValue STEER_ENCODER_METERS_PER_PULSE = new LoggedTunableValue(
       "Swerve/STEER_ENCODER_METERS_PER_PULSE",
       "STEER_ENCODER_METERS_PER_PULSE");
+
   private LoggedTunableValue ENCODER_RESOLUTION = new LoggedTunableValue("Swerve/ENCODER_RESOLUTION",
       "ENCODER_RESOLUTION");
   private LoggedTunableValue DRIVE_FEEDFORWARD_KS = new LoggedTunableValue("Swerve/DRIVE_FEEDFORWARD_KS",
@@ -52,14 +54,15 @@ public class Module extends SubsystemBase {
   private LoggedTunableValue STEER_I = new LoggedTunableValue("Swerve/STEER_I", "STEER_I");
   private LoggedTunableValue STEER_D = new LoggedTunableValue("Swerve/STEER_D", "STEER_D");
 
-  private LoggedTunableValue USING_ABSOLUTE_ENCODERS = new LoggedTunableValue("Swerve/USING_ABSOLUTE_ENCODERS",
-      "USING_ABSOLUTE_ENCODERS");
+  private LoggedTunableValue USING_CANCODERS = new LoggedTunableValue("Swerve/USING_CANCODERS",
+      "USING_CANCODERS");
 
   private SimpleMotorFeedforward driveFeedforward;
   private SimpleMotorFeedforward steerFeedforward;
   private final PIDController driveFeedback;
 
   private final PIDController steerFeedback;
+  public AccelerationLimiter accel = new AccelerationLimiter(15, 10);
 
   public Module(ModuleIO io, ModulePosition position) {
     this.io = io;
@@ -122,7 +125,7 @@ public class Module extends SubsystemBase {
     STEER_P.periodic();
     STEER_I.periodic();
     STEER_D.periodic();
-    USING_ABSOLUTE_ENCODERS.periodic();
+    USING_CANCODERS.periodic();
   }
 
   public void setDesiredState(SwerveModuleState state) {
@@ -132,7 +135,8 @@ public class Module extends SubsystemBase {
         +
         steerFeedback.calculate(getAngle().getRadians(), optimizedState.angle.getRadians()));
 
-    double velocityRadPerSec = optimizedState.speedMetersPerSecond / (double) WHEEL_RADIUS_METERS.getDouble();
+    double velocityRadPerSec = accel
+        .calculate(optimizedState.speedMetersPerSecond / (double) WHEEL_RADIUS_METERS.getDouble());
 
     io.setDriveVoltage(
         driveFeedforward.calculate(velocityRadPerSec)
@@ -142,7 +146,7 @@ public class Module extends SubsystemBase {
 
   public Rotation2d getAngle() {
 
-    if ((boolean) USING_ABSOLUTE_ENCODERS.getBool()) {
+    if ((boolean) USING_CANCODERS.getBool()) {
       return new Rotation2d(MathUtil.angleModulus(inputs.steerAbsolutePositionRad));
     } else
       return new Rotation2d(MathUtil.angleModulus(inputs.steerPositionRad));
@@ -188,7 +192,7 @@ public class Module extends SubsystemBase {
 
   public Rotation2d getHeadingRotation2d() {
 
-    if ((boolean) USING_ABSOLUTE_ENCODERS.getBool()) {
+    if ((boolean) USING_CANCODERS.getBool()) {
       return Rotation2d
           .fromRadians(inputs.steerAbsolutePositionRad);
     } else

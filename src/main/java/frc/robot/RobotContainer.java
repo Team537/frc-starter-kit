@@ -9,6 +9,7 @@ import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.auto.PIDConstants;
 import com.pathplanner.lib.auto.SwerveAutoBuilder;
 
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -33,6 +34,7 @@ public class RobotContainer {
         private YAMLDataHolder yamlDataHolder;
         private FieldSim fieldSim;
         private SwerveAutoBuilder swerveAutoBuilder;
+        private SlewRateLimiter slewRateLimiter = new SlewRateLimiter(0.3);
         List<PathPlannerTrajectory> pathGroup = PathPlanner.loadPathGroup("Test Path", new PathConstraints(4, 3));
 
         private LoggedTunableValue PATH_PLANNER_DRIVE_P = new LoggedTunableValue("PathPlanner/PATH_PLANNER_DRIVE_P",
